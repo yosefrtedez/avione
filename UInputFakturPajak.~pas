@@ -1,0 +1,92 @@
+unit UInputFakturPajak;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, RzButton, RzEdit, ComCtrls, RzDTP, StdCtrls, Mask, RzLabel,
+  RzPanel, ExtCtrls, RzBtnEdt, DB, ZAbstractRODataset, ZAbstractDataset,
+  ZDataset;
+
+type
+  TFrm_Variabel = class(TForm)
+    RzPanel1: TRzPanel;
+    Label19: TLabel;
+    RzGroupBox1: TRzGroupBox;
+    RzLabel1: TRzLabel;
+    RzPanel2: TRzPanel;
+    BtnBatal: TRzBitBtn;
+    BtnOK: TRzBitBtn;
+    txtkode: TRzButtonEdit;
+    LNoFaktur: TRzLabel;
+    ZQuery1: TZQuery;
+    procedure BtnBatalClick(Sender: TObject);
+    procedure BtnOKClick(Sender: TObject);
+    procedure txtkodeButtonClick(Sender: TObject);
+    procedure txtkodeExit(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+    procedure ClearText;
+  end;
+
+var
+  Frm_Variabel: TFrm_Variabel;
+
+implementation
+
+uses UDM, UDataNomorFaktur;
+
+{$R *.dfm}
+
+procedure TFrm_Variabel.BtnBatalClick(Sender: TObject);
+begin
+  ModalResult := mrCancel;
+end;
+
+procedure TFrm_Variabel.BtnOKClick(Sender: TObject);
+begin
+  ModalResult := mrOk;
+end;
+
+procedure TFrm_Variabel.ClearText;
+begin
+  txtkode.Clear;
+  LNoFaktur.Caption := '0';
+end;
+
+procedure TFrm_Variabel.txtkodeButtonClick(Sender: TObject);
+begin
+  Application.CreateForm(TFrm_DataNomorFaktur, Frm_DataNomorFaktur);
+  Frm_DataNomorFaktur.RefreshQ;
+  if Frm_DataNomorFaktur.ShowModal = mrok then begin
+    txtkode.Text := Frm_DataNomorFaktur.QData.FieldValues['kodefaktur'];
+    LNoFaktur.Caption := Frm_DataNomorFaktur.QData.FieldValues['nofaktur'];
+  end;
+end;
+
+procedure TFrm_Variabel.txtkodeExit(Sender: TObject);
+begin
+  if txtkode.Text = '' then begin
+    LNoFaktur.Caption := '0';
+  end else begin
+    with TZQuery.Create(Self)do begin
+      Connection := DM.con;
+      Close;
+      SQL.Clear;
+      SQL.Text := 'SELECT * FROM tbl_nomorfaktur WHERE nofaktur NOT IN (SELECT nofaktur FROM tbl_penjualan) and kodefaktur=:kf';
+      ParamByName('kf').Value := txtkode.Text;
+      Open;
+      if IsEmpty then begin
+        txtkode.Clear;
+        LNoFaktur.Caption := '0';
+      end else begin
+        LNoFaktur.Caption := FieldValues['nofaktur'];
+      end;
+      Free;
+    end;
+  end;
+end;
+
+end.
