@@ -24,7 +24,7 @@ object Frm_DaftarBarang1: TFrm_DaftarBarang1
     Align = alTop
     Alignment = taLeftJustify
     BorderOuter = fsNone
-    Caption = 'Daftar Barang'
+    Caption = 'Data Barang'
     Color = 16744448
     Font.Charset = ANSI_CHARSET
     Font.Color = clWhite
@@ -86,6 +86,7 @@ object Frm_DaftarBarang1: TFrm_DaftarBarang1
       LookAndFeel.NativeStyle = False
       LookAndFeel.SkinName = 'Blue'
       object dbgdataDBTableView1: TcxGridDBTableView
+        OnDblClick = dbgdataDBTableView1DblClick
         NavigatorButtons.ConfirmDelete = False
         DataController.DataSource = DSData
         DataController.Filter.Options = [fcoCaseInsensitive]
@@ -194,7 +195,6 @@ object Frm_DaftarBarang1: TFrm_DaftarBarang1
   end
   object QData: TZQuery
     Connection = DM.con
-    Active = True
     SQL.Strings = (
       'SELECT g.*,IFNULL(h.kelompokbarang,'#39#39')AS kelompokbarang FROM '
       

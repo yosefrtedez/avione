@@ -255,7 +255,7 @@ object Frm_RincianPiutang: TFrm_RincianPiutang
       'LEFT JOIN tbl_kontak AS h ON h.nokontak=g.nokontak   '
       'UNION ALL'
       'SELECT g.*,h.namakontak FROM'
-      '(SELECT f.*,f.sisapiutang AS N1,0 AS N2,0 AS N3,0 AS N4 FROM'
+      '(SELECT f.*,0 AS N1,f.sisapiutang AS N2,0 AS N3,0 AS N4 FROM'
       
         '(SELECT e.*,e.totalpiutang-e.jumlahbayar-e.jumlahretur AS sisapi' +
         'utang FROM '
@@ -284,7 +284,7 @@ object Frm_RincianPiutang: TFrm_RincianPiutang
       'LEFT JOIN tbl_kontak AS h ON h.nokontak=g.nokontak  '
       'UNION ALL'
       'SELECT g.*,h.namakontak FROM'
-      '(SELECT f.*,f.sisapiutang AS N1,0 AS N2,0 AS N3,0 AS N4 FROM'
+      '(SELECT f.*,0 AS N1,0 AS N2,f.sisapiutang AS N3,0 AS N4 FROM'
       
         '(SELECT e.*,e.totalpiutang-e.jumlahbayar-e.jumlahretur AS sisapi' +
         'utang FROM '
@@ -313,7 +313,7 @@ object Frm_RincianPiutang: TFrm_RincianPiutang
       'LEFT JOIN tbl_kontak AS h ON h.nokontak=g.nokontak  '
       'UNION ALL'
       'SELECT g.*,h.namakontak FROM'
-      '(SELECT f.*,f.sisapiutang AS N1,0 AS N2,0 AS N3,0 AS N4 FROM'
+      '(SELECT f.*,0 AS N1,0 AS N2,0 AS N3,f.sisapiutang AS N4 FROM'
       
         '(SELECT e.*,e.totalpiutang-e.jumlahbayar-e.jumlahretur AS sisapi' +
         'utang FROM '

@@ -144,43 +144,49 @@ object Frm_DaftarBarang: TFrm_DaftarBarang
           Caption = 'Kode Barang'
           DataBinding.FieldName = 'kodebarang'
           HeaderAlignmentHorz = taCenter
-          Width = 86
+          Width = 109
         end
         object dbgdataDBTableView1namabarang: TcxGridDBColumn
           Caption = 'Nama'
           DataBinding.FieldName = 'namabarang'
           HeaderAlignmentHorz = taCenter
-          Width = 322
+          Width = 254
         end
         object dbgdataDBTableView1kelompokbarang: TcxGridDBColumn
           Caption = 'Kelompok Barang'
           DataBinding.FieldName = 'kelompokbarang'
           HeaderAlignmentHorz = taCenter
-          Width = 137
+          Width = 151
+        end
+        object dbgdataDBTableView1namagudang: TcxGridDBColumn
+          Caption = 'Gudang'
+          DataBinding.FieldName = 'namagudang'
+          HeaderAlignmentHorz = taCenter
+          Width = 150
         end
         object dbgdataDBTableView1Column1: TcxGridDBColumn
           Caption = 'Tipe'
           DataBinding.FieldName = 'tipe'
           HeaderAlignmentHorz = taCenter
-          Width = 122
+          Width = 118
         end
         object dbgdataDBTableView1tersedia: TcxGridDBColumn
           Caption = 'Tersedia'
           DataBinding.FieldName = 'total'
           HeaderAlignmentHorz = taCenter
-          Width = 97
+          Width = 95
         end
         object dbgdataDBTableView1kodesatuan: TcxGridDBColumn
           Caption = 'Unit'
           DataBinding.FieldName = 'kodesatuan'
           HeaderAlignmentHorz = taCenter
-          Width = 81
+          Width = 79
         end
         object dbgdataDBTableView1hargajual: TcxGridDBColumn
           Caption = 'Harga Jual'
           DataBinding.FieldName = 'hargajual'
           HeaderAlignmentHorz = taCenter
-          Width = 98
+          Width = 96
         end
         object dbgdataDBTableView1Column2: TcxGridDBColumn
           Caption = 'Aktif'
@@ -190,6 +196,7 @@ object Frm_DaftarBarang: TFrm_DaftarBarang
           Properties.ValueChecked = 1
           Properties.ValueUnchecked = 0
           HeaderAlignmentHorz = taCenter
+          Width = 72
         end
       end
       object dbgdataLevel1: TcxGridLevel
@@ -290,7 +297,8 @@ object Frm_DaftarBarang: TFrm_DaftarBarang
   object QData: TZQuery
     Connection = DM.con
     SQL.Strings = (
-      'SELECT g.*,IFNULL(h.kelompokbarang,'#39#39')AS kelompokbarang FROM '
+      'SELECT g.*,IFNULL(h.namagudang,'#39#39')AS namagudang FROM '
+      '(SELECT g.*,IFNULL(h.kelompokbarang,'#39#39')AS kelompokbarang FROM '
       
         '(SELECT c.*,CONCAT(d.kodesatuan,'#39'('#39',ROUND(c.faktor),'#39')'#39')AS kodes' +
         'atuan FROM '
@@ -320,7 +328,8 @@ object Frm_DaftarBarang: TFrm_DaftarBarang
       'LEFT JOIN tbl_satuan AS d ON d.nosatuan=c.nosatuan)AS g '
       
         'LEFT JOIN tbl_kelompokbarang AS h ON h.nokelompokbarang=g.nokelo' +
-        'mpokbarang'
+        'mpokbarang)as g '
+      'LEFT JOIN tbl_gudang AS h ON h.nogudang=g.nogudang '
       'ORDER BY g.namabarang')
     Params = <>
     Left = 384
@@ -383,6 +392,15 @@ object Frm_DaftarBarang: TFrm_DaftarBarang
     end
     object QDataaktif: TSmallintField
       FieldName = 'aktif'
+    end
+    object QDatanogudang: TLargeintField
+      FieldName = 'nogudang'
+      ReadOnly = True
+    end
+    object QDatanamagudang: TStringField
+      FieldName = 'namagudang'
+      ReadOnly = True
+      Size = 50
     end
   end
   object Q1: TZQuery

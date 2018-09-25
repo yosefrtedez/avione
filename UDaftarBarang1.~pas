@@ -56,6 +56,7 @@ type
     Q1: TZQuery;
     procedure BtnSelesaiClick(Sender: TObject);
     procedure BtnUpdateClick(Sender: TObject);
+    procedure dbgdataDBTableView1DblClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -68,7 +69,7 @@ var
 
 implementation
 
-uses UDM, UMain;
+uses UDM, UMain, ULokasiBarang;
 
 {$R *.dfm}
 
@@ -89,6 +90,15 @@ end;
 procedure TFrm_DaftarBarang1.BtnUpdateClick(Sender: TObject);
 begin
   RefreshQ;
+end;
+
+procedure TFrm_DaftarBarang1.dbgdataDBTableView1DblClick(Sender: TObject);
+begin
+  if QData.IsEmpty then Exit;
+  Application.CreateForm(TFrm_LokasiBarang, Frm_LokasiBarang);
+  nobar := QData.FieldValues['nobarang'];
+  Frm_LokasiBarang.RefreshQ;
+  Frm_LokasiBarang.ShowModal;
 end;
 
 end.

@@ -169,6 +169,7 @@ object Frm_DaftarPengirimanBarang: TFrm_DaftarPengirimanBarang
       Font.Style = []
       ParentFont = False
       TabOrder = 1
+      Visible = False
       OnClick = BtnVariabelClick
     end
   end

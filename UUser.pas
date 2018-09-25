@@ -188,6 +188,15 @@ begin
             if not IsEmpty then
               Frm_SettingWewenang.Data10.Checked := True
             else Frm_SettingWewenang.Data10.Checked := False;
+            Close;
+            SQL.Clear;
+            SQL.Text := 'select * from tbl_userwewenang where namauser=:a and wewenang=:b';
+            ParamByName('a').Value := QUser.FieldValues['namauser'];
+            ParamByName('b').Value := 'Data11';
+            Open;
+            if not IsEmpty then
+              Frm_SettingWewenang.Data11.Checked := True
+            else Frm_SettingWewenang.Data11.Checked := False;
           end else begin
             Frm_SettingWewenang.cbdata.Checked := False;
             Frm_SettingWewenang.cbdataClick(nil);
@@ -766,6 +775,14 @@ begin
                 ParamByName('b').Value := 'Data10';
                 ExecSQL;
               end;
+              if Frm_SettingWewenang.Data11.Checked = True then begin
+                Close;
+                SQL.Clear;
+                SQL.Text := 'insert into tbl_userwewenang values (:a,:b)';
+                ParamByName('a').Value := Frm_SettingWewenang.txtNama.Text;
+                ParamByName('b').Value := 'Data11';
+                ExecSQL;
+              end;
             end;
             if Frm_SettingWewenang.cbpembelian.Checked = True then begin
               if Frm_SettingWewenang.Pembelian1.Checked = True then begin
@@ -1270,6 +1287,15 @@ begin
             if not IsEmpty then
               Frm_SettingWewenang.Data10.Checked := True
             else Frm_SettingWewenang.Data10.Checked := False;
+            Close;
+            SQL.Clear;
+            SQL.Text := 'select * from tbl_userwewenang where namauser=:a and wewenang=:b';
+            ParamByName('a').Value := QUser.FieldValues['namauser'];
+            ParamByName('b').Value := 'Data11';
+            Open;
+            if not IsEmpty then
+              Frm_SettingWewenang.Data11.Checked := True
+            else Frm_SettingWewenang.Data11.Checked := False;
           end else begin
             Frm_SettingWewenang.cbdata.Checked := False;
             Frm_SettingWewenang.cbdataClick(nil);
@@ -1846,6 +1872,14 @@ begin
                 SQL.Text := 'insert into tbl_userwewenang values (:a,:b)';
                 ParamByName('a').Value := Frm_SettingWewenang.txtNama.Text;
                 ParamByName('b').Value := 'Data10';
+                ExecSQL;
+              end;
+              if Frm_SettingWewenang.Data11.Checked = True then begin
+                Close;
+                SQL.Clear;
+                SQL.Text := 'insert into tbl_userwewenang values (:a,:b)';
+                ParamByName('a').Value := Frm_SettingWewenang.txtNama.Text;
+                ParamByName('b').Value := 'Data11';
                 ExecSQL;
               end;
             end;
@@ -2469,6 +2503,14 @@ begin
             SQL.Text := 'insert into tbl_userwewenang values (:a,:b)';
             ParamByName('a').Value := Frm_SettingWewenang.txtNama.Text;
             ParamByName('b').Value := 'Data10';
+            ExecSQL;
+          end;
+          if Frm_SettingWewenang.Data11.Checked = True then begin
+            Close;
+            SQL.Clear;
+            SQL.Text := 'insert into tbl_userwewenang values (:a,:b)';
+            ParamByName('a').Value := Frm_SettingWewenang.txtNama.Text;
+            ParamByName('b').Value := 'Data11';
             ExecSQL;
           end;
         end;

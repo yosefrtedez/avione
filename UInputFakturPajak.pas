@@ -18,6 +18,8 @@ type
     BtnOK: TRzBitBtn;
     ZQuery1: TZQuery;
     txtkode: TRzEdit;
+    RzLabel2: TRzLabel;
+    txtrange: TRzNumericEdit;
     procedure BtnBatalClick(Sender: TObject);
     procedure BtnOKClick(Sender: TObject);
   private
@@ -49,6 +51,7 @@ end;
 procedure TFrm_Variabel.ClearText;
 begin
   txtkode.Clear;
+  txtrange.Value := 0;
 end;
 
 end.

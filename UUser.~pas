@@ -68,29 +68,31 @@ begin
         with Frm_SettingWewenang do begin
           ClearText;
           Frm_SettingWewenang.ProsesTree('0');
+          //1508
+          cxlCabang.EditValue := QUser.FieldValues['nocabang'];
           txtNama.Text := QUser.FieldValues['namauser'];
           txtNama.Enabled := False;
           txtpassword.Text := QUser.FieldValues['sandiuser'];
-          Close;
-          SQL.Clear;
-          SQL.Text := 'SELECT a.nogudang, a.namagudang, b.namauser FROM ' +
-                      '(SELECT 0 AS nogudang,'+QuotedStr('Gudang Utama')+'AS namagudang ' +
-                      'UNION ' +
-                      'SELECT nogudang, namagudang FROM tbl_gudang)AS a ' +
-                      'LEFT JOIN tbl_usergudang b ON a.nogudang = b.nogudang AND b.namauser =:aa';
-          ParamByName('aa').Value := txtNama.Text;
-          Open;
-          while not Eof do begin
+          Q1.Close;
+          Q1.SQL.Clear;
+          Q1.SQL.Text :=  'SELECT a.nogudang, a.namagudang, b.namauser FROM ' +
+                          '(SELECT 0 AS nogudang,'+QuotedStr('Gudang Utama')+'AS namagudang ' +
+                          'UNION ' +
+                          'SELECT nogudang, namagudang FROM tbl_gudang)AS a ' +
+                          'LEFT JOIN tbl_usergudang b ON a.nogudang = b.nogudang AND b.namauser =:aa';
+          Q1.ParamByName('aa').Value := txtNama.Text;
+          Q1.Open;
+          while not Q1.Eof do begin
             with cxtbGudang.DataController do begin
               i := AppendRecord;
-              if FieldByName('namauser').IsNull then
+              if Q1.FieldByName('namauser').IsNull then
                 Values[i, cxColPilih.Index] := 0
               else
                 Values[i, cxColPilih.Index] := 1;
-              Values[i, cxColNamaGudang.Index] := FieldByName('namagudang').AsString;
-              Values[i, cxColNoGudang.Index] := FieldByName('nogudang').AsInteger;
+              Values[i, cxColNamaGudang.Index] := Q1.FieldByName('namagudang').AsString;
+              Values[i, cxColNoGudang.Index] := Q1.FieldByName('nogudang').AsInteger;
             end;
-            Next;
+            Q1.Next;
           end;
 
           if QUser.FieldValues['aksesdata']=1 then begin
@@ -633,7 +635,8 @@ begin
           if Frm_SettingWewenang.ShowModal = mrok then begin
             Close;
             SQL.Clear;
-            SQL.Text := 'update tbl_user set sandiuser=:bb, aksesdata=:b, aksesbukubesar=:c, aksespenjualan=:d, aksespembelian=:e, akseskas=:f, aksespersediaan=:g, akseslaporan=:h, nogudang=:i where namauser=:a';
+            // 1508
+            SQL.Text := 'update tbl_user set sandiuser=:bb, aksesdata=:b, aksesbukubesar=:c, aksespenjualan=:d, aksespembelian=:e, akseskas=:f, aksespersediaan=:g, akseslaporan=:h, nogudang=:i, nocabang=:j where namauser=:a';
             ParamByName('a').Value := Frm_SettingWewenang.txtNama.Text;
             ParamByName('bb').Value := Frm_SettingWewenang.txtpassword.Text;
             if Frm_SettingWewenang.cbdata.Checked = True then
@@ -658,6 +661,8 @@ begin
               ParamByName('h').Value := 1
             else ParamByName('h').Value := 0;
             ParamByName('i').Value := 0;
+            // 1508
+            ParamByname('j').Value := Frm_SettingWewenang.cxlCabang.EditValue;
             ExecSQL;
             Close;
             SQL.Clear;
@@ -1145,31 +1150,31 @@ begin
         with Frm_SettingWewenang do begin
           ClearText;
           Frm_SettingWewenang.ProsesTree('0');
+          //1508
+          cxlCabang.EditValue := QUser.FieldValues['nocabang'];
           txtNama.Text := QUser.FieldValues['namauser'];
           txtNama.Enabled := False;
           txtpassword.Text := QUser.FieldValues['sandiuser'];
-          Close;
-          SQL.Clear;
-          Close;
-          SQL.Clear;
-          SQL.Text := 'SELECT a.nogudang, a.namagudang, b.namauser FROM ' +
-                      '(SELECT 0 AS nogudang,'+QuotedStr('Gudang Utama')+'AS namagudang ' +
-                      'UNION ' +
-                      'SELECT nogudang, namagudang FROM tbl_gudang)AS a ' +
-                      'LEFT JOIN tbl_usergudang b ON a.nogudang = b.nogudang AND b.namauser =:aa';
-          ParamByName('aa').Value := txtNama.Text;
-          Open;
-          while not Eof do begin
+          Q1.Close;
+          Q1.SQL.Clear;
+          Q1.SQL.Text :=  'SELECT a.nogudang, a.namagudang, b.namauser FROM ' +
+                          '(SELECT 0 AS nogudang,'+QuotedStr('Gudang Utama')+'AS namagudang ' +
+                          'UNION ' +
+                          'SELECT nogudang, namagudang FROM tbl_gudang)AS a ' +
+                          'LEFT JOIN tbl_usergudang b ON a.nogudang = b.nogudang AND b.namauser =:aa';
+          Q1.ParamByName('aa').Value := txtNama.Text;
+          Q1.Open;
+          while not Q1.Eof do begin
             with cxtbGudang.DataController do begin
               i := AppendRecord;
-              if FieldByName('namauser').IsNull then
+              if Q1.FieldByName('namauser').IsNull then
                 Values[i, cxColPilih.Index] := 0
               else
                 Values[i, cxColPilih.Index] := 1;
-              Values[i, cxColNamaGudang.Index] := FieldByName('namagudang').AsString;
-              Values[i, cxColNoGudang.Index] := FieldByName('nogudang').AsInteger;
+              Values[i, cxColNamaGudang.Index] := Q1.FieldByName('namagudang').AsString;
+              Values[i, cxColNoGudang.Index] := Q1.FieldByName('nogudang').AsInteger;
             end;
-            Next;
+            Q1.Next;
           end;
 
           if QUser.FieldValues['aksesdata']=1 then begin
@@ -1712,7 +1717,8 @@ begin
           if Frm_SettingWewenang.ShowModal = mrok then begin
             Close;
             SQL.Clear;
-            SQL.Text := 'update tbl_user set sandiuser=:bb, aksesdata=:b, aksesbukubesar=:c, aksespenjualan=:d, aksespembelian=:e, akseskas=:f, aksespersediaan=:g, akseslaporan=:h,nogudang=:i where namauser=:a';
+            //1508
+            SQL.Text := 'update tbl_user set sandiuser=:bb, aksesdata=:b, aksesbukubesar=:c, aksespenjualan=:d, aksespembelian=:e, akseskas=:f, aksespersediaan=:g, akseslaporan=:h,nogudang=:i, nocabang=:j where namauser=:a';
             ParamByName('a').Value := Frm_SettingWewenang.txtNama.Text;
             ParamByName('bb').Value := Frm_SettingWewenang.txtpassword.Text;
             if Frm_SettingWewenang.cbdata.Checked = True then
@@ -1736,6 +1742,8 @@ begin
             if Frm_SettingWewenang.cblaporan.Checked = True then
               ParamByName('h').Value := 1
             else ParamByName('h').Value := 0;
+            //1508
+            ParamByName('j').Value := Frm_SettingWewenang.cxlCabang.EditValue;
             ParamByName('i').Value := 0;
             ExecSQL;
             Close;
@@ -2331,7 +2339,8 @@ begin
       if Frm_SettingWewenang.ShowModal = mrok then begin
         Close;
         SQL.Clear;
-        SQL.Text := 'insert into tbl_user values (:a,:b,:c,:d,:e,:f,:g,:h,:i,:j,:k)';
+        //1508
+        SQL.Text := 'insert into tbl_user values (:a,:b,:c,:d,:e,:f,:g,:h,:i,:j,:k,:l)';
         ParamByName('a').Value := Frm_SettingWewenang.txtNama.Text;
         ParamByName('b').Value := Frm_SettingWewenang.txtpassword.Text;
         ParamByName('c').Value := 0;
@@ -2357,6 +2366,8 @@ begin
           ParamByName('j').Value := 1
         else ParamByName('j').Value := 0;
         ParamByName('k').Value := 0;
+        //1508
+        ParamByName('l').Value := Frm_SettingWewenang.cxlCabang.EditValue;
         ExecSQL;
         Close;
         SQL.Clear;

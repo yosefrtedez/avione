@@ -94,7 +94,7 @@ object Frm_DaftarPenjualanTunai: TFrm_DaftarPenjualanTunai
       Font.Name = 'Calibri'
       Font.Style = []
       ParentFont = False
-      TabOrder = 3
+      TabOrder = 4
       OnClick = BtnSelesaiClick
     end
     object BtnHapus: TRzBitBtn
@@ -123,7 +123,7 @@ object Frm_DaftarPenjualanTunai: TFrm_DaftarPenjualanTunai
       Font.Name = 'Calibri'
       Font.Style = []
       ParentFont = False
-      TabOrder = 2
+      TabOrder = 3
       OnClick = BtnCetakClick
     end
     object RzBitBtn1: TRzBitBtn
@@ -138,8 +138,23 @@ object Frm_DaftarPenjualanTunai: TFrm_DaftarPenjualanTunai
       Font.Name = 'Calibri'
       Font.Style = []
       ParentFont = False
-      TabOrder = 1
+      TabOrder = 2
       OnClick = RzBitBtn1Click
+    end
+    object BtnVariabel: TRzBitBtn
+      Left = 87
+      Top = 7
+      Width = 98
+      Caption = 'Faktur Pajak'
+      Color = 12615680
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clWhite
+      Font.Height = -13
+      Font.Name = 'Calibri'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 1
+      OnClick = BtnVariabelClick
     end
   end
   object dbgdata: TcxGrid

@@ -352,9 +352,13 @@ begin
     with FTanggal do begin
       if FTanggal.ShowModal = mrok then begin
         DM.QPenjualanRangkuman3.Close;
+        DM.QPenjualanRangkuman3Retur.Close;
         DM.QPenjualanRangkuman3.ParamByName('tkd').Value := FormatDateTime('yyyy-mm-dd',dtpdari.Date);
         DM.QPenjualanRangkuman3.ParamByName('tks').Value := FormatDateTime('yyyy-mm-dd',dtpsampai.Date);
+        DM.QPenjualanRangkuman3Retur.ParamByName('tkd').Value := FormatDateTime('yyyy-mm-dd',dtpdari.Date);
+        DM.QPenjualanRangkuman3Retur.ParamByName('tks').Value := FormatDateTime('yyyy-mm-dd',dtpsampai.Date);
         DM.QPenjualanRangkuman3.Open;
+        DM.QPenjualanRangkuman3Retur.Open;
         t := TfrxMemoView(DM.Rpt_PenjualanRangkuman3.FindObject('txtperiode'));
         t.Memo.Text := FormatDateTime('dd MMMM yyyy',dtpdari.Date)+' - ' +FormatDateTime('dd MMMM yyyy',dtpsampai.Date);
         if cbpreview.Checked = False then begin
@@ -686,6 +690,46 @@ begin
         DM.Rpt_PenjualanRincian3.ShowReport(True);
       end;
     end;
+  end else if MemoPenjualan.ItemIndex = 8 then begin
+    Application.CreateForm(TFTanggal, FTanggal);
+    with FTanggal do begin
+      if FTanggal.ShowModal = mrok then begin
+        DM.Q_PenjualanRincian4.Close;
+        DM.Q_PenjualanRincian4.ParamByName('tkd').Value := FormatDateTime('yyyy-mm-dd',dtpdari.Date);
+        DM.Q_PenjualanRincian4.ParamByName('tks').Value := FormatDateTime('yyyy-mm-dd',dtpsampai.Date);
+        DM.Q_PenjualanRincian4.Open;
+        t := TfrxMemoView(DM.Rpt_PenjualanRincian4.FindObject('txtperiode'));
+        t.Memo.Text := FormatDateTime('dd MMMM yyyy',dtpdari.Date)+' - ' +FormatDateTime('dd MMMM yyyy',dtpsampai.Date);
+        if cbpreview.Checked = False then begin
+          frxPreview1.Visible := False;
+          DM.Rpt_PenjualanRincian4.Preview :=  nil;
+        end else begin
+          frxPreview1.Visible := True;
+          DM.Rpt_PenjualanRincian4.Preview :=  frxPreview1;
+        end;
+        DM.Rpt_PenjualanRincian4.ShowReport(True);
+      end;
+    end;
+  end else if MemoPenjualan.ItemIndex = 9 then begin
+    Application.CreateForm(TFTanggal, FTanggal);
+    with FTanggal do begin
+      if FTanggal.ShowModal = mrok then begin
+        DM.Q_PenjualanRincian5.Close;
+        DM.Q_PenjualanRincian5.ParamByName('tkd').Value := FormatDateTime('yyyy-mm-dd',dtpdari.Date);
+        DM.Q_PenjualanRincian5.ParamByName('tks').Value := FormatDateTime('yyyy-mm-dd',dtpsampai.Date);
+        DM.Q_PenjualanRincian5.Open;
+        t := TfrxMemoView(DM.Rpt_PenjualanRincian5.FindObject('txtperiode'));
+        t.Memo.Text := FormatDateTime('dd MMMM yyyy',dtpdari.Date)+' - ' +FormatDateTime('dd MMMM yyyy',dtpsampai.Date);
+        if cbpreview.Checked = False then begin
+          frxPreview1.Visible := False;
+          DM.Rpt_PenjualanRincian5.Preview :=  nil;
+        end else begin
+          frxPreview1.Visible := True;
+          DM.Rpt_PenjualanRincian5.Preview :=  frxPreview1;
+        end;
+        DM.Rpt_PenjualanRincian5.ShowReport(True);
+      end;
+    end;
   end;
 end;
 
@@ -887,16 +931,16 @@ begin
 
             DM.QKartuStokUmum.SQL.Clear;
             DM.QKartuStokUmum.SQL.Text := 'SELECT a.*,b.kodesatuan FROM ' +
+                                          '(SELECT a.*,CASE WHEN a.kodereferensi IS NULL AND a.tipe='+QuotedStr('IJ')+' THEN (SELECT kodepenerimaanbarang FROM tbl_penerimaanbarang WHERE nopenerimaanbarang=a.noreferensi) END AS koderef FROM ' +
                                           '(SELECT a.*,b.nobuku,b.tgltransaksi,b.masuk,b.keluar,b.keterangan,b.noreferensi,b.tipe,CASE ' +
                                           'WHEN b.tipe='+QuotedStr('TO')+' THEN (SELECT kodepembelianterima FROM tbl_pembelianterima WHERE nopembelianterima=noreferensi) ' +
                                           'WHEN b.tipe='+QuotedStr('PR')+' THEN (SELECT kodereturpembelian FROM tbl_returpembelian WHERE noreturpembelian=noreferensi) ' +
                                           'WHEN b.tipe='+QuotedStr('DO')+' THEN (SELECT kodepenjualankirim FROM tbl_penjualankirim WHERE nopenjualankirim=noreferensi) ' +
                                           'WHEN b.tipe='+QuotedStr('SR')+' THEN (SELECT kodereturpenjualan FROM tbl_returpenjualan WHERE noreturpenjualan=noreferensi) ' +
                                           'WHEN b.tipe='+QuotedStr('SP')+' THEN (SELECT kodepenjualantunai FROM tbl_penjualantunai WHERE nopenjualantunai=noreferensi) ' +
-                                          'WHEN b.tipe='+QuotedStr('IJ')+' THEN (SELECT g.koderef FROM(SELECT nopenyesuaian AS noref,kodepenyesuaian AS koderef FROM tbl_penyesuaian UNION SELECT nopenerimaanbarang AS noref,' +
-                                          'kodepenerimaanbarang AS koderef FROM tbl_penerimaanbarang)AS g WHERE g.noref=noreferensi) END AS kodereferensi FROM ' +
+                                          'WHEN b.tipe='+QuotedStr('IJ')+' THEN (SELECT kodepenyesuaian FROM tbl_penyesuaian WHERE nopenyesuaian=noreferensi) END AS kodereferensi FROM ' +
                                           '(SELECT nobarang,kodebarang,namabarang,nosatuan FROM tbl_barang WHERE tipebarang=0 AND aktif=1)AS a ' +
-                                          'LEFT JOIN tbl_bukubesarbarang AS b ON b.nobarang=a.nobarang and b.tgltransaksi BETWEEN :tkd AND :tks)AS a ' +
+                                          'LEFT JOIN tbl_bukubesarbarang AS b ON b.nobarang=a.nobarang and b.tgltransaksi BETWEEN :tkd AND :tks)AS a)as a ' +
                                           'LEFT JOIN tbl_satuan AS b ON b.nosatuan=a.nosatuan ORDER BY a.namabarang,a.tgltransaksi,a.nobuku';
           end else begin
             DM.QKartuStokUmumAwal.SQL.Clear;
@@ -904,16 +948,16 @@ begin
 
             DM.QKartuStokUmum.SQL.Clear;
             DM.QKartuStokUmum.SQL.Text := 'SELECT a.*,b.kodesatuan FROM ' +
+                                          '(SELECT a.*,CASE WHEN a.kodereferensi IS NULL AND a.tipe='+QuotedStr('IJ')+' THEN (SELECT kodepenerimaanbarang FROM tbl_penerimaanbarang WHERE nopenerimaanbarang=a.noreferensi) END AS koderef FROM ' +
                                           '(SELECT a.*,b.nobuku,b.tgltransaksi,b.masuk,b.keluar,b.keterangan,b.noreferensi,b.tipe,CASE ' +
                                           'WHEN b.tipe='+QuotedStr('TO')+' THEN (SELECT kodepembelianterima FROM tbl_pembelianterima WHERE nopembelianterima=noreferensi) ' +
                                           'WHEN b.tipe='+QuotedStr('PR')+' THEN (SELECT kodereturpembelian FROM tbl_returpembelian WHERE noreturpembelian=noreferensi) ' +
                                           'WHEN b.tipe='+QuotedStr('DO')+' THEN (SELECT kodepenjualankirim FROM tbl_penjualankirim WHERE nopenjualankirim=noreferensi) ' +
                                           'WHEN b.tipe='+QuotedStr('SR')+' THEN (SELECT kodereturpenjualan FROM tbl_returpenjualan WHERE noreturpenjualan=noreferensi) ' +
                                           'WHEN b.tipe='+QuotedStr('SP')+' THEN (SELECT kodepenjualantunai FROM tbl_penjualantunai WHERE nopenjualantunai=noreferensi) ' +
-                                          'WHEN b.tipe='+QuotedStr('IJ')+' THEN (SELECT g.koderef FROM(SELECT nopenyesuaian AS noref,kodepenyesuaian AS koderef FROM tbl_penyesuaian UNION SELECT nopenerimaanbarang AS noref,' +
-                                          'kodepenerimaanbarang AS koderef FROM tbl_penerimaanbarang)AS g WHERE g.noref=noreferensi) END AS kodereferensi FROM ' +
+                                          'WHEN b.tipe='+QuotedStr('IJ')+' THEN (SELECT kodepenyesuaian FROM tbl_penyesuaian WHERE nopenyesuaian=noreferensi) END AS kodereferensi FROM ' +
                                           '(SELECT nobarang,kodebarang,namabarang,nosatuan FROM tbl_barang WHERE tipebarang=0 AND aktif=1)AS a ' +
-                                          'LEFT JOIN tbl_bukubesarbarang AS b ON b.nobarang=a.nobarang and b.tgltransaksi BETWEEN :tkd AND :tks and nogudang=:ng)AS a ' +
+                                          'LEFT JOIN tbl_bukubesarbarang AS b ON b.nobarang=a.nobarang and b.tgltransaksi BETWEEN :tkd AND :tks and nogudang=:ng)AS a)as a ' +
                                           'LEFT JOIN tbl_satuan AS b ON b.nosatuan=a.nosatuan ORDER BY a.namabarang,a.tgltransaksi,a.nobuku';
             DM.QKartuStokUmum.ParamByName('ng').Value := LGudang.Caption;
           end;
@@ -924,16 +968,16 @@ begin
 
             DM.QKartuStokUmum.SQL.Clear;
             DM.QKartuStokUmum.SQL.Text := 'SELECT a.*,b.kodesatuan FROM ' +
+                                          '(SELECT a.*,CASE WHEN a.kodereferensi IS NULL AND a.tipe='+QuotedStr('IJ')+' THEN (SELECT kodepenerimaanbarang FROM tbl_penerimaanbarang WHERE nopenerimaanbarang=a.noreferensi) END AS koderef FROM ' +
                                           '(SELECT a.*,b.nobuku,b.tgltransaksi,b.masuk,b.keluar,b.keterangan,b.noreferensi,b.tipe,CASE ' +
                                           'WHEN b.tipe='+QuotedStr('TO')+' THEN (SELECT kodepembelianterima FROM tbl_pembelianterima WHERE nopembelianterima=noreferensi) ' +
                                           'WHEN b.tipe='+QuotedStr('PR')+' THEN (SELECT kodereturpembelian FROM tbl_returpembelian WHERE noreturpembelian=noreferensi) ' +
                                           'WHEN b.tipe='+QuotedStr('DO')+' THEN (SELECT kodepenjualankirim FROM tbl_penjualankirim WHERE nopenjualankirim=noreferensi) ' +
                                           'WHEN b.tipe='+QuotedStr('SR')+' THEN (SELECT kodereturpenjualan FROM tbl_returpenjualan WHERE noreturpenjualan=noreferensi) ' +
                                           'WHEN b.tipe='+QuotedStr('SP')+' THEN (SELECT kodepenjualantunai FROM tbl_penjualantunai WHERE nopenjualantunai=noreferensi) ' +
-                                          'WHEN b.tipe='+QuotedStr('IJ')+' THEN (SELECT g.koderef FROM(SELECT nopenyesuaian AS noref,kodepenyesuaian AS koderef FROM tbl_penyesuaian UNION SELECT nopenerimaanbarang AS noref,' +
-                                          'kodepenerimaanbarang AS koderef FROM tbl_penerimaanbarang)AS g WHERE g.noref=noreferensi) END AS kodereferensi FROM ' +
+                                          'WHEN b.tipe='+QuotedStr('IJ')+' THEN (SELECT kodepenyesuaian FROM tbl_penyesuaian WHERE nopenyesuaian=noreferensi) END AS kodereferensi FROM ' +
                                           '(SELECT nobarang,kodebarang,namabarang,nosatuan FROM tbl_barang WHERE tipebarang=0 AND aktif=1 and nobarang=:nk)AS a ' +
-                                          'LEFT JOIN tbl_bukubesarbarang AS b ON b.nobarang=a.nobarang and b.tgltransaksi BETWEEN :tkd AND :tks)AS a ' +
+                                          'LEFT JOIN tbl_bukubesarbarang AS b ON b.nobarang=a.nobarang and b.tgltransaksi BETWEEN :tkd AND :tks)AS a)as a ' +
                                           'LEFT JOIN tbl_satuan AS b ON b.nosatuan=a.nosatuan ORDER BY a.namabarang,a.tgltransaksi,a.nobuku';
           end else begin
             DM.QKartuStokUmumAwal.SQL.Clear;
@@ -941,16 +985,16 @@ begin
 
             DM.QKartuStokUmum.SQL.Clear;
             DM.QKartuStokUmum.SQL.Text := 'SELECT a.*,b.kodesatuan FROM ' +
+                                          '(SELECT a.*,CASE WHEN a.kodereferensi IS NULL AND a.tipe='+QuotedStr('IJ')+' THEN (SELECT kodepenerimaanbarang FROM tbl_penerimaanbarang WHERE nopenerimaanbarang=a.noreferensi) END AS koderef FROM ' +
                                           '(SELECT a.*,b.nobuku,b.tgltransaksi,b.masuk,b.keluar,b.keterangan,b.noreferensi,b.tipe,CASE ' +
                                           'WHEN b.tipe='+QuotedStr('TO')+' THEN (SELECT kodepembelianterima FROM tbl_pembelianterima WHERE nopembelianterima=noreferensi) ' +
                                           'WHEN b.tipe='+QuotedStr('PR')+' THEN (SELECT kodereturpembelian FROM tbl_returpembelian WHERE noreturpembelian=noreferensi) ' +
                                           'WHEN b.tipe='+QuotedStr('DO')+' THEN (SELECT kodepenjualankirim FROM tbl_penjualankirim WHERE nopenjualankirim=noreferensi) ' +
                                           'WHEN b.tipe='+QuotedStr('SR')+' THEN (SELECT kodereturpenjualan FROM tbl_returpenjualan WHERE noreturpenjualan=noreferensi) ' +
                                           'WHEN b.tipe='+QuotedStr('SP')+' THEN (SELECT kodepenjualantunai FROM tbl_penjualantunai WHERE nopenjualantunai=noreferensi) ' +
-                                          'WHEN b.tipe='+QuotedStr('IJ')+' THEN (SELECT g.koderef FROM(SELECT nopenyesuaian AS noref,kodepenyesuaian AS koderef FROM tbl_penyesuaian UNION SELECT nopenerimaanbarang AS noref,' +
-                                          'kodepenerimaanbarang AS koderef FROM tbl_penerimaanbarang)AS g WHERE g.noref=noreferensi) END AS kodereferensi FROM ' +
+                                          'WHEN b.tipe='+QuotedStr('IJ')+' THEN (SELECT kodepenyesuaian FROM tbl_penyesuaian WHERE nopenyesuaian=noreferensi) END AS kodereferensi FROM ' +
                                           '(SELECT nobarang,kodebarang,namabarang,nosatuan FROM tbl_barang WHERE tipebarang=0 AND aktif=1 and nobarang=:nk)AS a ' +
-                                          'LEFT JOIN tbl_bukubesarbarang AS b ON b.nobarang=a.nobarang and b.tgltransaksi BETWEEN :tkd AND :tks and nogudang=:ng)AS a ' +
+                                          'LEFT JOIN tbl_bukubesarbarang AS b ON b.nobarang=a.nobarang and b.tgltransaksi BETWEEN :tkd AND :tks and nogudang=:ng)AS a)as a ' +
                                           'LEFT JOIN tbl_satuan AS b ON b.nosatuan=a.nosatuan ORDER BY a.namabarang,a.tgltransaksi,a.nobuku';
             DM.QKartuStokUmum.ParamByName('ng').Value := LGudang.Caption;
           end;
@@ -959,8 +1003,8 @@ begin
         DM.QKartuStokUmumAwal.ParamByName('tkd').Value := FormatDateTime('yyyy-mm-dd',dtpdari.Date);
         DM.QKartuStokUmum.ParamByName('tkd').Value := FormatDateTime('yyyy-mm-dd',dtpdari.Date);
         DM.QKartuStokUmum.ParamByName('tks').Value := FormatDateTime('yyyy-mm-dd',dtpsampai.Date);
-        DM.QKartuStokUmumAwal.Open;
         DM.QKartuStokUmum.Open;
+        DM.QKartuStokUmumAwal.Open;
         t := TfrxMemoView(DM.Rpt_KartuStokUmum.FindObject('txtperiode'));
         if LGudang.Caption = '0' then
           t.Memo.Text := FormatDateTime('dd MMMM yyyy',dtpdari.Date)+' - ' +FormatDateTime('dd MMMM yyyy',dtpsampai.Date)
@@ -975,27 +1019,30 @@ begin
         DM.Rpt_KartuStokUmum.ShowReport(True);
       end;
     end;
-  {end else if MemoPersediaan.ItemIndex = 2 then begin
+  end else if MemoPersediaan.ItemIndex = 2 then begin
     Application.CreateForm(TFTanggal, FTanggal);
     with FTanggal do begin
       if ShowModal = mrok then begin
-        DM.Q_ItemDibeli.Close;
-        DM.Q_ItemDibeli.ParamByName('tkd').Value := FormatDateTime('yyyy-mm-dd',dtpdari.Date);
-        DM.Q_ItemDibeli.ParamByName('tks').Value := FormatDateTime('yyyy-mm-dd',dtpsampai.Date);
-        DM.Q_ItemDibeli.Open;
-        t := TfrxMemoView(DM.Rpt_ItemDibeli.FindObject('txtperiode'));
+        DM.Q_KartuStokBarangAwal.Close;
+        DM.Q_KartuStokBarang.Close;
+        DM.Q_KartuStokBarangAwal.ParamByName('tkd').Value := FormatDateTime('yyyy-mm-dd',dtpdari.Date);
+        DM.Q_KartuStokBarang.ParamByName('tkd').Value := FormatDateTime('yyyy-mm-dd',dtpdari.Date);
+        DM.Q_KartuStokBarang.ParamByName('tks').Value := FormatDateTime('yyyy-mm-dd',dtpsampai.Date);
+        DM.Q_KartuStokBarang.Open;
+        DM.Q_KartuStokBarangAwal.Open;
+        t := TfrxMemoView(DM.Rpt_KartuStokBarang.FindObject('txtperiode'));
         t.Memo.Text := FormatDateTime('dd MMMM yyyy',dtpdari.Date)+' - ' +FormatDateTime('dd MMMM yyyy',dtpsampai.Date);
         if cbpreview.Checked = False then begin
           frxPreview1.Visible := False;
-          DM.Rpt_ItemDibeli.Preview :=  nil;
+          DM.Rpt_KartuStokBarang.Preview :=  nil;
         end else begin
           frxPreview1.Visible := True;
-          DM.Rpt_ItemDibeli.Preview :=  frxPreview1;
+          DM.Rpt_KartuStokBarang.Preview :=  frxPreview1;
         end;
-        DM.Rpt_ItemDibeli.ShowReport(True);
+        DM.Rpt_KartuStokBarang.ShowReport(True);
       end;
     end;
-  end else if MemoPersediaan.ItemIndex = 3 then begin
+  {end else if MemoPersediaan.ItemIndex = 3 then begin
     Application.CreateForm(TFTanggal, FTanggal);
     with FTanggal do begin
       if ShowModal = mrok then begin

@@ -24,7 +24,7 @@ object Frm_MenuLaporan: TFrm_MenuLaporan
     Align = alClient
     BorderOuter = fsNone
     Color = clWhite
-    TabOrder = 2
+    TabOrder = 0
     object frxPreview1: TfrxPreview
       Left = 0
       Top = 0
@@ -46,7 +46,7 @@ object Frm_MenuLaporan: TFrm_MenuLaporan
     Height = 642
     Align = alLeft
     BorderOuter = fsNone
-    TabOrder = 0
+    TabOrder = 1
     object ScrollBox1: TScrollBox
       Left = 0
       Top = 0
@@ -69,7 +69,7 @@ object Frm_MenuLaporan: TFrm_MenuLaporan
         Font.Name = 'Calibri'
         Font.Style = []
         ParentFont = False
-        TabOrder = 1
+        TabOrder = 0
         OnClick = RzBitBtn1Click
         ImageIndex = 36
         Images = DM.I64
@@ -88,7 +88,7 @@ object Frm_MenuLaporan: TFrm_MenuLaporan
         Font.Name = 'Calibri'
         Font.Style = []
         ParentFont = False
-        TabOrder = 2
+        TabOrder = 1
         OnClick = RzBitBtn2Click
         ImageIndex = 35
         Images = DM.I64
@@ -107,7 +107,7 @@ object Frm_MenuLaporan: TFrm_MenuLaporan
         Font.Name = 'Calibri'
         Font.Style = []
         ParentFont = False
-        TabOrder = 4
+        TabOrder = 3
         OnClick = RzBitBtn6Click
         ImageIndex = 34
         Images = DM.I64
@@ -126,7 +126,7 @@ object Frm_MenuLaporan: TFrm_MenuLaporan
         Font.Name = 'Calibri'
         Font.Style = []
         ParentFont = False
-        TabOrder = 3
+        TabOrder = 2
         OnClick = RzBitBtn4Click
         ImageIndex = 33
         Images = DM.I64
@@ -145,7 +145,7 @@ object Frm_MenuLaporan: TFrm_MenuLaporan
         Font.Name = 'Calibri'
         Font.Style = []
         ParentFont = False
-        TabOrder = 0
+        TabOrder = 4
         OnClick = RzBitBtn3Click
         ImageIndex = 32
         Images = DM.I64
@@ -161,7 +161,7 @@ object Frm_MenuLaporan: TFrm_MenuLaporan
     Align = alLeft
     BorderOuter = fsNone
     Color = clWhite
-    TabOrder = 1
+    TabOrder = 2
     object LJudul: TRzPanel
       Left = 0
       Top = 0
@@ -186,7 +186,7 @@ object Frm_MenuLaporan: TFrm_MenuLaporan
       Align = alBottom
       BorderOuter = fsNone
       Color = clWindow
-      TabOrder = 6
+      TabOrder = 1
       object cbpreview: TRzCheckBox
         Left = 8
         Top = 8
@@ -211,7 +211,7 @@ object Frm_MenuLaporan: TFrm_MenuLaporan
       Height = 274
       ActivePage = TabCashBank
       TabIndex = 2
-      TabOrder = 1
+      TabOrder = 2
       TabStyle = tsRoundCorners
       FixedDimension = 21
       object TabFinansial: TRzTabSheet
@@ -285,7 +285,9 @@ object Frm_MenuLaporan: TFrm_MenuLaporan
           FrameVisible = True
           ItemHeight = 15
           Items.Strings = (
-            'Lap. Kas Harian')
+            'Lap. Kas Harian'
+            'Lap. Penerimaan Lain'
+            'Lap. Pengeluaran Lain')
           ParentFont = False
           TabOrder = 0
           OnDblClick = MemoKasDblClick
@@ -299,7 +301,7 @@ object Frm_MenuLaporan: TFrm_MenuLaporan
       Height = 274
       ActivePage = TabSales
       TabIndex = 0
-      TabOrder = 2
+      TabOrder = 3
       TabStyle = tsRoundCorners
       FixedDimension = 21
       object TabSales: TRzTabSheet
@@ -327,7 +329,9 @@ object Frm_MenuLaporan: TFrm_MenuLaporan
             'Lap. Penjualan By Customer'
             'Lap. Penjualan By Gudang'
             'Lap. Penjualan By Sales'
-            'Lap. Penjualan By Tester')
+            'Lap. Penjualan By Tester'
+            'Lap. Penjualan By Product Reguler'
+            'Lap. Penjualan By Product Tester')
           ParentFont = False
           TabOrder = 0
           OnDblClick = MemoPenjualanDblClick
@@ -367,7 +371,7 @@ object Frm_MenuLaporan: TFrm_MenuLaporan
       Height = 274
       ActivePage = TabPurchase
       TabIndex = 0
-      TabOrder = 3
+      TabOrder = 4
       TabStyle = tsRoundCorners
       FixedDimension = 21
       object TabPurchase: TRzTabSheet
@@ -428,7 +432,7 @@ object Frm_MenuLaporan: TFrm_MenuLaporan
       Height = 274
       ActivePage = TabInventory
       TabIndex = 0
-      TabOrder = 4
+      TabOrder = 5
       TabStyle = tsRoundCorners
       FixedDimension = 21
       object TabInventory: TRzTabSheet
@@ -450,7 +454,8 @@ object Frm_MenuLaporan: TFrm_MenuLaporan
           ItemHeight = 15
           Items.Strings = (
             'Lap. Stok Barang - Total'
-            'Lap. Stok Barang - Rincian')
+            'Lap. Stok Barang - Rincian'
+            'Lap. Stok Barang - Rangkuman')
           ParentFont = False
           TabOrder = 0
           OnDblClick = MemoPersediaanDblClick
@@ -486,7 +491,7 @@ object Frm_MenuLaporan: TFrm_MenuLaporan
       Height = 274
       ActivePage = TabName
       TabIndex = 0
-      TabOrder = 5
+      TabOrder = 6
       TabStyle = tsRoundCorners
       FixedDimension = 21
       object TabName: TRzTabSheet

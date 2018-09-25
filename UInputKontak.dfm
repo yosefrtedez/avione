@@ -4,7 +4,7 @@ object Frm_InputKontak: TFrm_InputKontak
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'Data Kontak'
-  ClientHeight = 433
+  ClientHeight = 502
   ClientWidth = 615
   Color = clBtnFace
   Font.Charset = ANSI_CHARSET
@@ -40,7 +40,7 @@ object Frm_InputKontak: TFrm_InputKontak
     Left = 0
     Top = 25
     Width = 615
-    Height = 367
+    Height = 436
     ActivePage = TabSheet2
     ActivePageDefault = TabSheet1
     Align = alClient
@@ -76,7 +76,7 @@ object Frm_InputKontak: TFrm_InputKontak
         Left = 0
         Top = 0
         Width = 613
-        Height = 97
+        Height = 161
         Align = alTop
         BorderOuter = fsFlat
         TabOrder = 0
@@ -95,14 +95,14 @@ object Frm_InputKontak: TFrm_InputKontak
           Caption = 'Nama'
         end
         object RzLabel28: TRzLabel
-          Left = 96
+          Left = 120
           Top = 11
           Width = 3
           Height = 15
           Caption = ':'
         end
         object RzLabel29: TRzLabel
-          Left = 96
+          Left = 120
           Top = 39
           Width = 3
           Height = 15
@@ -119,19 +119,48 @@ object Frm_InputKontak: TFrm_InputKontak
         object RzLabel33: TRzLabel
           Left = 8
           Top = 66
-          Width = 69
+          Width = 100
           Height = 15
-          Caption = 'Nama NPWP'
+          Caption = 'Nama NPWP / KTP'
         end
         object RzLabel35: TRzLabel
-          Left = 96
+          Left = 120
           Top = 66
           Width = 3
           Height = 15
           Caption = ':'
         end
+        object RzLabel18: TRzLabel
+          Left = 120
+          Top = 120
+          Width = 3
+          Height = 15
+          Caption = ':'
+        end
+        object RzLabel34: TRzLabel
+          Left = 8
+          Top = 120
+          Width = 105
+          Height = 33
+          Caption = 'NPWP (kosongkan jika tidak ada)'
+          WordWrap = True
+        end
+        object RzLabel27: TRzLabel
+          Left = 8
+          Top = 93
+          Width = 19
+          Height = 15
+          Caption = 'NIK'
+        end
+        object RzLabel37: TRzLabel
+          Left = 120
+          Top = 93
+          Width = 3
+          Height = 15
+          Caption = ':'
+        end
         object txtkode: TRzEdit
-          Left = 104
+          Left = 128
           Top = 8
           Width = 201
           Height = 23
@@ -142,7 +171,7 @@ object Frm_InputKontak: TFrm_InputKontak
           TabOrder = 0
         end
         object txtnama: TRzEdit
-          Left = 104
+          Left = 128
           Top = 36
           Width = 468
           Height = 23
@@ -152,7 +181,7 @@ object Frm_InputKontak: TFrm_InputKontak
           TabOrder = 1
         end
         object txtnamanpwp: TRzEdit
-          Left = 104
+          Left = 128
           Top = 63
           Width = 468
           Height = 23
@@ -161,12 +190,32 @@ object Frm_InputKontak: TFrm_InputKontak
           TabOnEnter = True
           TabOrder = 2
         end
+        object txtnpwp: TRzEdit
+          Left = 128
+          Top = 117
+          Width = 337
+          Height = 23
+          FrameHotTrack = True
+          FrameVisible = True
+          TabOnEnter = True
+          TabOrder = 4
+        end
+        object txtfield1: TRzEdit
+          Left = 128
+          Top = 90
+          Width = 337
+          Height = 23
+          FrameHotTrack = True
+          FrameVisible = True
+          TabOnEnter = True
+          TabOrder = 3
+        end
       end
       object RzPanel5: TRzPanel
         Left = 0
-        Top = 188
+        Top = 252
         Width = 613
-        Height = 153
+        Height = 158
         Align = alClient
         BorderOuter = fsFlat
         TabOrder = 2
@@ -391,7 +440,7 @@ object Frm_InputKontak: TFrm_InputKontak
       end
       object RzPanel4: TRzPanel
         Left = 0
-        Top = 97
+        Top = 161
         Width = 613
         Height = 91
         Align = alTop
@@ -411,26 +460,12 @@ object Frm_InputKontak: TFrm_InputKontak
           Height = 15
           Caption = ':'
         end
-        object RzLabel34: TRzLabel
-          Left = 10
-          Top = 40
-          Width = 34
-          Height = 15
-          Caption = 'NPWP'
-        end
         object LPlafon: TRzLabel
           Left = 314
           Top = 13
           Width = 41
           Height = 15
           Caption = 'LPlafon'
-        end
-        object RzLabel18: TRzLabel
-          Left = 96
-          Top = 40
-          Width = 3
-          Height = 15
-          Caption = ':'
         end
         object LSaldoAwal: TRzLabel
           Left = 314
@@ -472,14 +507,14 @@ object Frm_InputKontak: TFrm_InputKontak
         end
         object RzLabel5: TRzLabel
           Left = 10
-          Top = 67
+          Top = 40
           Width = 69
           Height = 15
           Caption = 'Pembayaran'
         end
         object RzLabel31: TRzLabel
           Left = 96
-          Top = 67
+          Top = 40
           Width = 3
           Height = 15
           Caption = ':'
@@ -506,16 +541,6 @@ object Frm_InputKontak: TFrm_InputKontak
             'Supplier'
             'Sales / Staff')
         end
-        object txtnpwp: TRzEdit
-          Left = 104
-          Top = 37
-          Width = 201
-          Height = 23
-          FrameHotTrack = True
-          FrameVisible = True
-          TabOnEnter = True
-          TabOrder = 1
-        end
         object txtplafon: TRzNumericEdit
           Left = 443
           Top = 10
@@ -523,7 +548,7 @@ object Frm_InputKontak: TFrm_InputKontak
           Height = 23
           FrameHotTrack = True
           FrameVisible = True
-          TabOrder = 3
+          TabOrder = 2
           IntegersOnly = False
           DisplayFormat = '#,#0.##'
         end
@@ -535,7 +560,7 @@ object Frm_InputKontak: TFrm_InputKontak
           FrameHotTrack = True
           FrameVisible = True
           ReadOnlyColor = clYellow
-          TabOrder = 4
+          TabOrder = 3
           IntegersOnly = False
           DisplayFormat = '#,#0.##'
         end
@@ -547,7 +572,7 @@ object Frm_InputKontak: TFrm_InputKontak
           FrameHotTrack = True
           FrameVisible = True
           TabOnEnter = True
-          TabOrder = 5
+          TabOrder = 4
           OnKeyPress = txtakunKeyPress
           AllowKeyEdit = False
           OnButtonClick = txtakunButtonClick
@@ -560,7 +585,7 @@ object Frm_InputKontak: TFrm_InputKontak
           FrameHotTrack = True
           FrameVisible = True
           TabOnEnter = True
-          TabOrder = 6
+          TabOrder = 5
           Visible = False
           OnKeyPress = txtakunpotonganKeyPress
           AllowKeyEdit = False
@@ -568,13 +593,13 @@ object Frm_InputKontak: TFrm_InputKontak
         end
         object txtpembayaran: TRzEdit
           Left = 104
-          Top = 64
+          Top = 37
           Width = 201
           Height = 23
           FrameHotTrack = True
           FrameVisible = True
           TabOnEnter = True
-          TabOrder = 2
+          TabOrder = 1
         end
       end
     end
@@ -623,26 +648,20 @@ object Frm_InputKontak: TFrm_InputKontak
         Caption = 'LFoto'
         Visible = False
       end
-      object RzLabel27: TRzLabel
-        Left = 8
-        Top = 274
-        Width = 25
-        Height = 15
-        Caption = 'NIK :'
-      end
       object RzLabel30: TRzLabel
         Left = 8
         Top = 302
-        Width = 43
+        Width = 33
         Height = 15
-        Caption = 'Field 2 :'
+        Caption = 'Field :'
       end
       object RzLabel36: TRzLabel
         Left = 8
         Top = 70
-        Width = 82
-        Height = 15
-        Caption = 'Alamat NPWP :'
+        Width = 73
+        Height = 35
+        Caption = 'Alamat NPWP / KTP :'
+        WordWrap = True
       end
       object txtalamat1: TRzEdit
         Left = 96
@@ -709,7 +728,7 @@ object Frm_InputKontak: TFrm_InputKontak
         Top = 12
         Width = 163
         Height = 199
-        TabOrder = 10
+        TabOrder = 9
         object Image1: TImage
           Left = 2
           Top = 2
@@ -742,14 +761,14 @@ object Frm_InputKontak: TFrm_InputKontak
         Font.Name = 'Calibri'
         Font.Style = []
         ParentFont = False
-        TabOrder = 11
+        TabOrder = 10
         DropDownMenu = PopupMenu1
       end
       object BtnHapusGambar: TRzBitBtn
         Left = 528
         Top = 216
         Caption = 'Hapus'
-        TabOrder = 12
+        TabOrder = 11
         OnClick = BtnHapusGambarClick
       end
       object ComboBox1: TComboBox
@@ -758,25 +777,15 @@ object Frm_InputKontak: TFrm_InputKontak
         Width = 101
         Height = 23
         ItemHeight = 15
-        TabOrder = 13
+        TabOrder = 12
         Visible = False
       end
       object BtnCapture: TRzBitBtn
         Left = 448
         Top = 216
         Caption = 'Ambil'
-        TabOrder = 14
+        TabOrder = 13
         OnClick = BtnCaptureClick
-      end
-      object txtfield1: TRzEdit
-        Left = 96
-        Top = 271
-        Width = 337
-        Height = 23
-        FrameHotTrack = True
-        FrameVisible = True
-        TabOnEnter = True
-        TabOrder = 8
       end
       object txtfield2: TRzEdit
         Left = 96
@@ -786,7 +795,7 @@ object Frm_InputKontak: TFrm_InputKontak
         FrameHotTrack = True
         FrameVisible = True
         TabOnEnter = True
-        TabOrder = 9
+        TabOrder = 8
       end
       object txtalamat2npwp: TRzEdit
         Left = 96
@@ -815,7 +824,7 @@ object Frm_InputKontak: TFrm_InputKontak
         Left = 0
         Top = 0
         Width = 613
-        Height = 341
+        Height = 410
         Align = alClient
         GridLinesColor = clSilver
         GridLinesStyle = lsActiveHorzOnly
@@ -910,7 +919,7 @@ object Frm_InputKontak: TFrm_InputKontak
   end
   object RzPanel2: TRzPanel
     Left = 0
-    Top = 392
+    Top = 461
     Width = 615
     Height = 41
     Align = alBottom

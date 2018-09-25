@@ -4,7 +4,7 @@ object Frm_Variabel: TFrm_Variabel
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'Input Faktur Pajak'
-  ClientHeight = 140
+  ClientHeight = 166
   ClientWidth = 349
   Color = clBtnFace
   Font.Charset = ANSI_CHARSET
@@ -39,7 +39,7 @@ object Frm_Variabel: TFrm_Variabel
     Left = 0
     Top = 25
     Width = 349
-    Height = 78
+    Height = 104
     Align = alClient
     Caption = 'Faktur Pajak'
     TabOrder = 1
@@ -50,6 +50,13 @@ object Frm_Variabel: TFrm_Variabel
       Height = 15
       Caption = 'Nomor Faktur :'
     end
+    object RzLabel2: TRzLabel
+      Left = 8
+      Top = 54
+      Width = 39
+      Height = 15
+      Caption = 'Range :'
+    end
     object txtkode: TRzEdit
       Left = 104
       Top = 24
@@ -58,10 +65,24 @@ object Frm_Variabel: TFrm_Variabel
       FrameVisible = True
       TabOrder = 0
     end
+    object txtrange: TRzNumericEdit
+      Left = 104
+      Top = 51
+      Width = 65
+      Height = 23
+      TabStop = False
+      Color = clYellow
+      FrameHotTrack = True
+      FrameVisible = True
+      ReadOnly = True
+      ReadOnlyColor = clYellow
+      TabOrder = 1
+      DisplayFormat = ',0;(,0)'
+    end
   end
   object RzPanel2: TRzPanel
     Left = 0
-    Top = 103
+    Top = 129
     Width = 349
     Height = 37
     Align = alBottom

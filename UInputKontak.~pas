@@ -58,15 +58,12 @@ type
     cbtipe: TRzComboBox;
     RzLabel32: TRzLabel;
     txtcatatan: TRzMemo;
-    RzLabel34: TRzLabel;
-    txtnpwp: TRzEdit;
     TabSheet3: TRzTabSheet;
     LPlafon: TRzLabel;
     txtplafon: TRzNumericEdit;
     RzLabel9: TRzLabel;
     txtnegara: TRzEdit;
     txtsaldo: TRzNumericEdit;
-    RzLabel18: TRzLabel;
     RzPanel6: TRzPanel;
     BtnPilih: TRzMenuButton;
     BtnHapusGambar: TRzBitBtn;
@@ -100,8 +97,6 @@ type
     txtlatecharge: TRzNumericEdit;
     RzLabel25: TRzLabel;
     RzLabel26: TRzLabel;
-    RzLabel27: TRzLabel;
-    txtfield1: TRzEdit;
     txtfield2: TRzEdit;
     RzLabel30: TRzLabel;
     LAkun: TRzLabel;
@@ -119,6 +114,12 @@ type
     txtalamat2npwp: TRzEdit;
     txtalamat1npwp: TRzEdit;
     RzLabel36: TRzLabel;
+    RzLabel18: TRzLabel;
+    RzLabel34: TRzLabel;
+    txtnpwp: TRzEdit;
+    RzLabel27: TRzLabel;
+    txtfield1: TRzEdit;
+    RzLabel37: TRzLabel;
     procedure BtnBatalClick(Sender: TObject);
     procedure BtnRekamClick(Sender: TObject);
     procedure cbtipeSelect(Sender: TObject);
@@ -169,6 +170,16 @@ begin
   if txtnama.Text = '' then begin
     MessageDlg('Nama: harus diisi!',mtError,[mbOK],0);
     txtnama.SetFocus;
+    Exit;
+  end;
+  if txtnamanpwp.Text = '' then begin
+    MessageDlg('Nama NPWP/KTP: harus diisi!',mtError,[mbOK],0);
+    txtnamanpwp.SetFocus;
+    Exit;
+  end;
+  if (txtalamat1npwp.Text = '') and (txtalamat2npwp.Text = '')then begin
+    MessageDlg('Alamat NPWP/KTP: harus diisi!',mtError,[mbOK],0);
+    txtalamat1npwp.SetFocus;
     Exit;
   end;
   if LAkun.Caption = '0' then begin

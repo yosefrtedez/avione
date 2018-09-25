@@ -141,7 +141,8 @@ uses
   UInputFakturPajak in 'UInputFakturPajak.pas' {Frm_Variabel},
   UCetakCSV in 'UCetakCSV.pas' {Frm_DaftarCetakCSV},
   UDaftarBarang1 in 'UDaftarBarang1.pas' {Frm_DaftarBarang1},
-  ULokasiBarang in 'ULokasiBarang.pas' {Frm_LokasiBarang};
+  ULokasiBarang in 'ULokasiBarang.pas' {Frm_LokasiBarang},
+  UFTanggalCSV in 'UFTanggalCSV.pas' {FTanggalCSV};
 
 {$R *.res}
 

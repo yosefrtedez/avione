@@ -202,8 +202,8 @@ object Frm_DaftarBarang1: TFrm_DaftarBarang1
         'atuan FROM '
       '(SELECT a.*,tersedia DIV faktor AS total FROM'
       
-        '(SELECT g.*,IFNULL(SUM(h.masuk)-SUM(h.keluar),0)AS tersedia,IFNU' +
-        'LL(h.nogudang,0)AS nogudang FROM '
+        '(SELECT g.*,IFNULL(SUM(h.masuk)-SUM(h.keluar),0)AS tersedia FROM' +
+        ' '
       
         '(SELECT nobarang,kodebarang,namabarang,nokelompokbarang,nosatuan' +
         ',hargajual,1 AS faktor,case when tipebarang=0 then '#39'Persediaan'#39' ' +
@@ -222,7 +222,7 @@ object Frm_DaftarBarang1: TFrm_DaftarBarang1
       'WHERE nosatuan IS NOT NULL ORDER BY nobarang,faktor)AS g'
       
         'LEFT JOIN tbl_bukubesarbarang AS h ON h.nobarang=g.nobarang GROU' +
-        'P BY g.nobarang,h.nogudang,g.nosatuan,g.faktor)AS a)AS c '
+        'P BY g.nobarang,g.nosatuan,g.faktor)AS a)AS c '
       'LEFT JOIN tbl_satuan AS d ON d.nosatuan=c.nosatuan)AS g '
       
         'LEFT JOIN tbl_kelompokbarang AS h ON h.nokelompokbarang=g.nokelo' +

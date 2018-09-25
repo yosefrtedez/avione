@@ -137,6 +137,7 @@ type
     zqrCabang: TZReadOnlyQuery;
     dsCabang: TDataSource;
     RzLabel7: TRzLabel;
+    Data11: TRzCheckBox;
     procedure BtnBaruClick(Sender: TObject);
     procedure BtnBatalClick(Sender: TObject);
     procedure nxGrdAfterEdit(Sender: TObject; ACol, ARow: Integer;
@@ -339,6 +340,7 @@ begin
     Data8.Checked := True;
     Data9.Checked := True;
     Data10.Checked := True;
+    Data11.Checked := True;
   end else begin
     GBData.Enabled := False;
     Data1.Checked := False;
@@ -351,6 +353,7 @@ begin
     Data8.Checked := False;
     Data9.Checked := False;
     Data10.Checked := False;
+    Data11.Checked := False;
   end;
 end;
 

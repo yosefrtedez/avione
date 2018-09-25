@@ -221,34 +221,64 @@ begin
       Open;
       if IsEmpty then begin
         if MessageDlg('Apakah anda ingin menghapus Transaksi Pengiriman Barang, No. '+QDetil.FieldValues['kodepenjualankirim']+'?',mtConfirmation,[mbYes,mbNo],0)=mryes then begin
-          Close;
-          SQL.Clear;
-          SQL.Text := 'delete from tbl_bukubesarbarang where noreferensi=:np and tipe=:t';
-          ParamByName('np').Value := QDetil.FieldValues['nopenjualankirim'];
-          ParamByName('t').Value := 'DO';
-          ExecSQL;
-          Close;
-          SQL.Clear;
-          SQL.Text := 'delete from tbl_bukubesarbarangdetail where noreferensi=:np and tipe=:t';
-          ParamByName('np').Value := QDetil.FieldValues['nopenjualankirim'];
-          ParamByName('t').Value := 'DO';
-          ExecSQL;
-          Close;
-          SQL.Clear;
-          SQL.Text := 'delete from tbl_bukubesarakun where noreferensi=:np and tipe=:t';
-          ParamByName('np').Value := QDetil.FieldValues['nopenjualankirim'];
-          ParamByName('t').Value := 'SJ';
-          ExecSQL;
-          Close;
-          SQL.Clear;
-          SQL.Text := 'delete from tbl_penjualankirim where nopenjualankirim=:np';
-          ParamByName('np').Value := QDetil.FieldValues['nopenjualankirim'];
-          ExecSQL;
-          Close;
-          SQL.Clear;
-          SQL.Text := 'delete from tbl_penjualankirimdetail where nopenjualankirim=:np';
-          ParamByName('np').Value := QDetil.FieldValues['nopenjualankirim'];
-          ExecSQL;
+          Screen.Cursor := crSQLWait;
+          try
+            dm.con.StartTransaction;
+            Close;
+            SQL.Clear;
+            SQL.Text := 'delete from tbl_bukubesarbarang where noreferensi=:np and tipe=:t';
+            ParamByName('np').Value := QDetil.FieldValues['nopenjualankirim'];
+            ParamByName('t').Value := 'DO';
+            ExecSQL;
+            Close;
+            SQL.Clear;
+            SQL.Text := 'delete from tbl_bukubesarbarangdetail where noreferensi=:np and tipe=:t';
+            ParamByName('np').Value := QDetil.FieldValues['nopenjualankirim'];
+            ParamByName('t').Value := 'DO';
+            ExecSQL;
+            Close;
+            SQL.Clear;
+            SQL.Text := 'delete from tbl_bukubesarakun where noreferensi=:np and tipe=:t';
+            ParamByName('np').Value := QDetil.FieldValues['nopenjualankirim'];
+            ParamByName('t').Value := 'DO';
+            ExecSQL;
+            Close;
+            SQL.Clear;
+            SQL.Text := 'delete from tbl_bukubesarakun where noreferensi=:np and tipe=:t';
+            ParamByName('np').Value := QDetil.FieldValues['nopenjualankirim'];
+            ParamByName('t').Value := 'SJ';
+            ExecSQL;
+            Close;
+            SQL.Clear;
+            SQL.Text := 'delete from tbl_bukubesarlaba where noreferensi=:np and tipe=:t';
+            ParamByName('np').Value := QDetil.FieldValues['nopenjualankirim'];
+            ParamByName('t').Value := 'DO';
+            ExecSQL;
+            Close;
+            SQL.Clear;
+            SQL.Text := 'delete from tbl_bukubesarlaba where noreferensi=:np and tipe=:t';
+            ParamByName('np').Value := QDetil.FieldValues['nopenjualankirim'];
+            ParamByName('t').Value := 'SJ';
+            ExecSQL;
+            Close;
+            SQL.Clear;
+            SQL.Text := 'delete from tbl_penjualankirimdetail where nopenjualankirim=:np';
+            ParamByName('np').Value := QDetil.FieldValues['nopenjualankirim'];
+            ExecSQL;
+            Close;
+            SQL.Clear;
+            SQL.Text := 'delete from tbl_penjualankirim where nopenjualankirim=:np';
+            ParamByName('np').Value := QDetil.FieldValues['nopenjualankirim'];
+            ExecSQL;
+
+            dm.con.Commit;
+            Screen.Cursor := crDefault;
+          except
+            on E: Exception do begin
+              dm.con.Rollback;
+              MessageDlg('Error: ' + E.Message,mtWarning,[mbOk],0);
+            end;
+          end;
           RefreshQ;
         end;
       end else begin
@@ -278,34 +308,45 @@ begin
         Exit;
       end;
       if MessageDlg('Apakah anda ingin menghapus Invoice Penjualan, No. '+QDetil.FieldValues['kodepenjualaninvoice']+'?',mtConfirmation,[mbYes,mbNo],0)=mryes then begin
-        Close;
-        SQL.Clear;
-        SQL.Text := 'delete from tbl_penjualaninvoicedetail where nopenjualaninvoice=:np';
-        ParamByName('np').Value := QDetil.FieldValues['nopenjualaninvoice'];
-        ExecSQL;
-        Close;
-        SQL.Clear;
-        SQL.Text := 'delete from tbl_bukubesarakun where noreferensi=:np and tipe=:t';
-        ParamByName('np').Value := QDetil.FieldValues['nopenjualaninvoice'];
-        ParamByName('t').Value := 'SA';
-        ExecSQL;
-        Close;
-        SQL.Clear;
-        SQL.Text := 'delete from tbl_laba where noreferensi=:np and tipe=:t';
-        ParamByName('np').Value := QDetil.FieldValues['nopenjualaninvoice'];
-        ParamByName('t').Value := 'SA';
-        ExecSQL;
-        Close;
-        SQL.Clear;
-        SQL.Text := 'delete from tbl_bukubesarkontak where noreferensi=:np and tipe=:t';
-        ParamByName('np').Value := QDetil.FieldValues['nopenjualaninvoice'];
-        ParamByName('t').Value := 'SA';
-        ExecSQL;
-        Close;
-        SQL.Clear;
-        SQL.Text := 'delete from tbl_penjualaninvoice where nopenjualaninvoice=:np';
-        ParamByName('np').Value := QDetil.FieldValues['nopenjualaninvoice'];
-        ExecSQL;
+        Screen.Cursor := crSQLWait;
+        try
+          dm.con.StartTransaction;
+          Close;
+          SQL.Clear;
+          SQL.Text := 'delete from tbl_penjualaninvoicedetail where nopenjualaninvoice=:np';
+          ParamByName('np').Value := QDetil.FieldValues['nopenjualaninvoice'];
+          ExecSQL;
+          Close;
+          SQL.Clear;
+          SQL.Text := 'delete from tbl_bukubesarakun where noreferensi=:np and tipe=:t';
+          ParamByName('np').Value := QDetil.FieldValues['nopenjualaninvoice'];
+          ParamByName('t').Value := 'SA';
+          ExecSQL;
+          Close;
+          SQL.Clear;
+          SQL.Text := 'delete from tbl_laba where noreferensi=:np and tipe=:t';
+          ParamByName('np').Value := QDetil.FieldValues['nopenjualaninvoice'];
+          ParamByName('t').Value := 'SA';
+          ExecSQL;
+          Close;
+          SQL.Clear;
+          SQL.Text := 'delete from tbl_bukubesarkontak where noreferensi=:np and tipe=:t';
+          ParamByName('np').Value := QDetil.FieldValues['nopenjualaninvoice'];
+          ParamByName('t').Value := 'SA';
+          ExecSQL;
+          Close;
+          SQL.Clear;
+          SQL.Text := 'delete from tbl_penjualaninvoice where nopenjualaninvoice=:np';
+          ParamByName('np').Value := QDetil.FieldValues['nopenjualaninvoice'];
+          ExecSQL;
+          dm.con.Commit;
+          Screen.Cursor := crDefault;
+        except
+          on E: Exception do begin
+            dm.con.Rollback;
+            MessageDlg('Error: ' + E.Message,mtWarning,[mbOk],0);
+          end;
+        end;
         RefreshQ;
       end;
       Free;
@@ -694,6 +735,9 @@ begin
           //if QDetil.FieldValues['nopenjualaninvoice']>0 then LPosting.Caption := '1';
           LBiayaLain.Caption := FieldValues['noakunbiayalain'];
           txtbiaya.Value := FieldValues['biayalain'];
+          if FieldValues['approve'] = 1 then
+            cbapprove.Checked := True
+          else cbapprove.Checked := False;
 
           Close;
           SQL.Clear;
@@ -903,7 +947,7 @@ begin
           Connection := dm.con;
           Close;
           SQL.Clear;
-          SQL.Text := 'select * tbl_penjualankirim where nopenjualankirim=:np';
+          SQL.Text := 'select * from tbl_penjualankirim where nopenjualankirim=:np';
           ParamByName('np').Value := QDetil.FieldValues['nopenjualankirim'];
           Open;
           if FieldValues['approve']=0 then begin

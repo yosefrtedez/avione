@@ -4,16 +4,16 @@ object DM: TDM
   Left = 247
   Top = 153
   Height = 738
-  Width = 1352
+  Width = 1419
   object con: TZConnection
     ControlsCodePage = cGET_ACP
     AutoEncodeStrings = False
     TransactIsolationLevel = tiReadCommitted
-    HostName = 'tancorp.ddns.net'
-    Port = 3306
+    HostName = 'localhost'
+    Port = 3307
     Database = 'tancorp'
     User = 'root'
-    Password = 'tancorp123'
+    Password = 'newpos123'
     Protocol = 'mysql'
     Left = 8
     Top = 8
@@ -35117,6 +35117,10 @@ object DM: TDM
     SQL.Strings = (
       'SELECT a.*,b.kodesatuan FROM'
       
+        '(SELECT a.*,CASE WHEN a.kodereferensi IS NULL AND a.tipe='#39'IJ'#39' TH' +
+        'EN (SELECT kodepenerimaanbarang FROM tbl_penerimaanbarang WHERE ' +
+        'nopenerimaanbarang=a.noreferensi) END AS koderef FROM'
+      
         '(SELECT a.*,b.nobuku,b.tgltransaksi,b.masuk,b.keluar,b.keteranga' +
         'n,b.noreferensi,b.tipe,CASE'
       
@@ -35135,17 +35139,14 @@ object DM: TDM
         'WHEN b.tipe='#39'SP'#39' THEN (SELECT kodepenjualantunai FROM tbl_penjua' +
         'lantunai WHERE nopenjualantunai=noreferensi)'
       
-        'WHEN b.tipe='#39'IJ'#39' THEN (SELECT g.koderef FROM(SELECT nopenyesuaia' +
-        'n AS noref,kodepenyesuaian AS koderef FROM tbl_penyesuaian UNION' +
-        ' SELECT nopenerimaanbarang AS noref,kodepenerimaanbarang AS kode' +
-        'ref FROM tbl_penerimaanbarang)AS g WHERE g.noref=noreferensi) EN' +
-        'D AS kodereferensi FROM'
+        'WHEN b.tipe='#39'IJ'#39' THEN (SELECT kodepenyesuaian FROM tbl_penyesuai' +
+        'an WHERE nopenyesuaian=noreferensi) END AS kodereferensi FROM'
       
         '(SELECT nobarang,kodebarang,namabarang,nosatuan FROM tbl_barang ' +
         'WHERE tipebarang=0 AND aktif=1)AS a'
       
-        'LEFT JOIN tbl_bukubesarbarang AS b ON b.nobarang=a.nobarang HAVI' +
-        'NG b.tgltransaksi BETWEEN :tkd AND :tks)AS a'
+        'LEFT JOIN tbl_bukubesarbarang AS b ON b.nobarang=a.nobarang and ' +
+        'b.tgltransaksi BETWEEN :tkd AND :tks)AS a)AS a'
       
         'LEFT JOIN tbl_satuan AS b ON b.nosatuan=a.nosatuan ORDER BY a.no' +
         'barang,a.tgltransaksi,a.nobuku')
@@ -35460,7 +35461,9 @@ object DM: TDM
           Font.Style = []
           HideZeros = True
           Memo.UTF8 = (
-            '[DSKartuStokUmum."kodereferensi"]'
+            
+              '[IIF(<DSKartuStokUmum."kodereferensi">=null,<DSKartuStokUmum."ko' +
+              'deref">,<DSKartuStokUmum."kodereferensi">)]'
             
               '[IIF(<DSKartuStokUmum."tipe">='#39'TO'#39','#39'Pembelian'#39',IIF(<DSKartuStokU' +
               'mum."tipe">='#39'PR'#39','#39'Retur Pembelian'#39',IIF(<DSKartuStokUmum."tipe">=' +
@@ -36298,21 +36301,19 @@ object DM: TDM
     SQL.Strings = (
       
         'SELECT a.*,IFNULL(b.kodeakun,'#39#39')AS kodeakun,IFNULL(b.namaakun,'#39#39 +
-        ')AS namaakun,b.kas FROM'
-      '(SELECT a.*,b.noakun,b.debit AS masuk, b.kredit AS keluar FROM'
+        ')AS namaakun FROM'
       
-        '(SELECT a.nokas,b.tgltransaksi,b.tipe,b.noreferensi,b.keterangan' +
-        ' FROM'
-      '(SELECT noakun AS nokas FROM tbl_akun WHERE kas=1)AS a'
-      'LEFT JOIN tbl_bukubesarakun AS b ON b.noakun=a.nokas)AS a'
+        '(SELECT a.*,IFNULL(b.kodeakun,'#39#39')AS kodekas,IFNULL(b.namaakun,'#39#39 +
+        ')AS namakas FROM'
+      '(SELECT a.*,b.noakun AS akun,b.jumlah,b.memo FROM'
       
-        'LEFT JOIN tbl_bukubesarakun AS b ON b.tipe=a.tipe AND b.norefere' +
-        'nsi=a.noreferensi)AS a'
+        '(SELECT * FROM tbl_pengeluaranlain WHERE tgltransaksi BETWEEN :t' +
+        'kd AND :tks)AS a'
       
-        'LEFT JOIN tbl_akun AS b ON b.noakun=a.noakun HAVING a.tgltransak' +
-        'si IS NOT NULL and  a.tgltransaksi between :tkd and :tks AND (a.' +
-        'tipe='#39'PU'#39' OR a.tipe='#39'CD'#39' OR a.tipe='#39'CO'#39') ORDER BY a.tgltransaksi' +
-        ',a.tipe,a.noreferensi,b.kas ')
+        'LEFT JOIN tbl_pengeluaranlaindetail AS b ON b.nopengeluaran=a.no' +
+        'pengeluaran)AS a'
+      'LEFT JOIN tbl_akun AS b ON b.noakun=a.noakun)AS a'
+      'LEFT JOIN tbl_akun AS b ON b.noakun=a.akun ')
     Params = <
       item
         DataType = ftUnknown
@@ -36366,390 +36367,6 @@ object DM: TDM
     DataSet = QKas
     Left = 144
     Top = 383
-  end
-  object Rpt_KasKeluar: TfrxReport
-    Version = '5.2.3'
-    DotMatrixReport = False
-    IniFile = '\Software\Fast Reports'
-    PreviewOptions.Buttons = [pbPrint, pbLoad, pbSave, pbExport, pbZoom, pbFind, pbOutline, pbPageSetup, pbTools, pbEdit, pbNavigator, pbExportQuick]
-    PreviewOptions.Zoom = 1.000000000000000000
-    PrintOptions.Printer = 'Default'
-    PrintOptions.PrintOnSheet = 0
-    ReportOptions.CreateDate = 41624.593323761600000000
-    ReportOptions.LastChange = 41624.593323761600000000
-    ScriptLanguage = 'PascalScript'
-    ScriptText.Strings = (
-      'begin'
-      ''
-      'end.')
-    Left = 152
-    Top = 280
-    Datasets = <
-      item
-        DataSet = DS_KasKeluar
-        DataSetName = 'DS_KasKeluar'
-      end
-      item
-        DataSet = DSPerusahaan
-        DataSetName = 'DSPerusahaan'
-      end>
-    Variables = <>
-    Style = <>
-    object Data: TfrxDataPage
-      Height = 1000.000000000000000000
-      Width = 1000.000000000000000000
-    end
-    object Page1: TfrxReportPage
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clBlack
-      Font.Height = -11
-      Font.Name = 'Century Gothic'
-      Font.Style = []
-      PaperWidth = 210.000000000000000000
-      PaperHeight = 297.000000000000000000
-      PaperSize = 9
-      LeftMargin = 5.000000000000000000
-      RightMargin = 5.000000000000000000
-      TopMargin = 5.000000000000000000
-      BottomMargin = 5.000000000000000000
-      object ReportTitle1: TfrxReportTitle
-        FillType = ftBrush
-        Height = 113.385882910000000000
-        Top = 18.897650000000000000
-        Width = 755.906000000000000000
-        object Memo1: TfrxMemoView
-          Align = baWidth
-          Top = 18.897650000000000000
-          Width = 755.906000000000000000
-          Height = 26.456692910000000000
-          AutoWidth = True
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clBlack
-          Font.Height = -16
-          Font.Name = 'Century Gothic'
-          Font.Style = []
-          HAlign = haCenter
-          Memo.UTF8 = (
-            '[DSPerusahaan."nama"]')
-          ParentFont = False
-          VAlign = vaCenter
-        end
-        object Memo4: TfrxMemoView
-          Align = baWidth
-          Top = 45.354360000000000000
-          Width = 755.906000000000000000
-          Height = 26.456692910000000000
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clNavy
-          Font.Height = -21
-          Font.Name = 'Century Gothic'
-          Font.Style = [fsBold]
-          Frame.Width = 2.000000000000000000
-          HAlign = haCenter
-          Memo.UTF8 = (
-            'Pengeluaran Kas')
-          ParentFont = False
-          VAlign = vaCenter
-        end
-        object SysMemo2: TfrxSysMemoView
-          Width = 94.488250000000000000
-          Height = 18.897637795275600000
-          AutoWidth = True
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clBlack
-          Font.Height = -11
-          Font.Name = 'Century Gothic'
-          Font.Style = []
-          Memo.UTF8 = (
-            '[DATE], [TIME]')
-          ParentFont = False
-        end
-        object txtperiode: TfrxMemoView
-          Align = baWidth
-          Top = 71.811070000000000000
-          Width = 755.906000000000000000
-          Height = 18.897637795275600000
-          AutoWidth = True
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clMaroon
-          Font.Height = -11
-          Font.Name = 'Century Gothic'
-          Font.Style = []
-          HAlign = haCenter
-          ParentFont = False
-          VAlign = vaCenter
-        end
-      end
-      object MasterData1: TfrxMasterData
-        FillType = ftBrush
-        Height = 18.897647560000000000
-        Top = 257.008040000000000000
-        Width = 755.906000000000000000
-        DataSet = DS_KasKeluar
-        DataSetName = 'DS_KasKeluar'
-        RowCount = 0
-        Stretched = True
-        object Memo11: TfrxMemoView
-          Left = 188.976500000000000000
-          Width = 340.157700000000000000
-          Height = 18.897637800000000000
-          StretchMode = smActualHeight
-          DataField = 'namaakun'
-          DataSet = DS_KasKeluar
-          DataSetName = 'DS_KasKeluar'
-          DisplayFormat.FormatStr = '%2.2n'
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clBlack
-          Font.Height = -11
-          Font.Name = 'Century Gothic'
-          Font.Style = []
-          Frame.Width = 2.000000000000000000
-          Memo.UTF8 = (
-            '[DS_KasKeluar."namaakun"]')
-          ParentFont = False
-        end
-        object Memo2: TfrxMemoView
-          Left = 642.520100000000000000
-          Width = 113.385900000000000000
-          Height = 18.897637800000000000
-          StretchMode = smActualHeight
-          DataSet = DS_KasKeluar
-          DataSetName = 'DS_KasKeluar'
-          DisplayFormat.FormatStr = '#,#0.##'
-          DisplayFormat.Kind = fkNumeric
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clBlack
-          Font.Height = -11
-          Font.Name = 'Century Gothic'
-          Font.Style = []
-          Frame.Width = 2.000000000000000000
-          HAlign = haRight
-          Memo.UTF8 = (
-            '[<DS_KasKeluar."keluar">*<DS_KasKeluar."kurs">]')
-          ParentFont = False
-        end
-        object Memo7: TfrxMemoView
-          Left = 529.134200000000000000
-          Width = 113.385900000000000000
-          Height = 18.897637800000000000
-          StretchMode = smActualHeight
-          DataSet = DS_KasKeluar
-          DataSetName = 'DS_KasKeluar'
-          DisplayFormat.FormatStr = '#,#0.##'
-          DisplayFormat.Kind = fkNumeric
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clBlack
-          Font.Height = -11
-          Font.Name = 'Century Gothic'
-          Font.Style = []
-          Frame.Width = 2.000000000000000000
-          HAlign = haRight
-          Memo.UTF8 = (
-            '[<DS_KasKeluar."masuk">*<DS_KasKeluar."kurs">]')
-          ParentFont = False
-        end
-        object Memo10: TfrxMemoView
-          Left = 113.385900000000000000
-          Width = 75.590600000000000000
-          Height = 18.897637800000000000
-          StretchMode = smActualHeight
-          DataField = 'kodeakun'
-          DataSet = DS_KasKeluar
-          DataSetName = 'DS_KasKeluar'
-          DisplayFormat.FormatStr = '%2.2n'
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clBlack
-          Font.Height = -11
-          Font.Name = 'Century Gothic'
-          Font.Style = []
-          Frame.Width = 2.000000000000000000
-          Memo.UTF8 = (
-            '[DS_KasKeluar."kodeakun"]')
-          ParentFont = False
-        end
-      end
-      object PageFooter1: TfrxPageFooter
-        FillType = ftBrush
-        Height = 26.456710000000000000
-        Top = 381.732530000000000000
-        Width = 755.906000000000000000
-        object Memo52: TfrxMemoView
-          Align = baWidth
-          Top = 3.779530000000000000
-          Width = 755.906000000000000000
-          Height = 3.779527559055120000
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clBlack
-          Font.Height = -13
-          Font.Name = 'Century Gothic'
-          Font.Style = []
-          Frame.Typ = [ftTop]
-          Frame.Width = 2.000000000000000000
-          ParentFont = False
-          VAlign = vaCenter
-        end
-        object SysMemo1: TfrxSysMemoView
-          Top = 7.559060000000000000
-          Width = 151.181200000000000000
-          Height = 18.897637795275600000
-          AutoWidth = True
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clBlack
-          Font.Height = -11
-          Font.Name = 'Century Gothic'
-          Font.Style = []
-          Memo.UTF8 = (
-            'Halaman : [PAGE#]')
-          ParentFont = False
-        end
-      end
-      object GroupHeader2: TfrxGroupHeader
-        FillType = ftBrush
-        Height = 41.574817800000000000
-        Top = 192.756030000000000000
-        Width = 755.906000000000000000
-        Condition = 'DS_KasKeluar."noreferensi"'
-        object Memo3: TfrxMemoView
-          Left = 113.385900000000000000
-          Top = 22.677180000000000000
-          Width = 642.520100000000000000
-          Height = 18.897637800000000000
-          StretchMode = smActualHeight
-          DataSet = DS_KasKeluar
-          DataSetName = 'DS_KasKeluar'
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clBlack
-          Font.Height = -11
-          Font.Name = 'Century Gothic'
-          Font.Style = []
-          Frame.Width = 2.000000000000000000
-          Memo.UTF8 = (
-            '[DS_KasKeluar."keterangan"]')
-          ParentFont = False
-        end
-        object Memo5: TfrxMemoView
-          Width = 113.385777950000000000
-          Height = 18.897637800000000000
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clBlack
-          Font.Height = -11
-          Font.Name = 'Century Gothic'
-          Font.Style = [fsBold]
-          Frame.Style = fsDouble
-          Frame.Typ = [ftTop]
-          Memo.UTF8 = (
-            'Tanggal')
-          ParentFont = False
-          VAlign = vaCenter
-        end
-        object Memo6: TfrxMemoView
-          Left = 642.520100000000000000
-          Width = 113.385777950000000000
-          Height = 18.897637800000000000
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clBlack
-          Font.Height = -11
-          Font.Name = 'Century Gothic'
-          Font.Style = [fsBold]
-          Frame.Style = fsDouble
-          Frame.Typ = [ftTop]
-          HAlign = haRight
-          Memo.UTF8 = (
-            'Kredit')
-          ParentFont = False
-          VAlign = vaCenter
-        end
-        object Memo8: TfrxMemoView
-          Left = 113.385900000000000000
-          Width = 415.748177950000000000
-          Height = 18.897637800000000000
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clBlack
-          Font.Height = -11
-          Font.Name = 'Century Gothic'
-          Font.Style = [fsBold]
-          Frame.Style = fsDouble
-          Frame.Typ = [ftTop]
-          Memo.UTF8 = (
-            'Deskripsi')
-          ParentFont = False
-          VAlign = vaCenter
-        end
-        object Memo9: TfrxMemoView
-          Left = 529.134200000000000000
-          Width = 113.385777950000000000
-          Height = 18.897637800000000000
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clBlack
-          Font.Height = -11
-          Font.Name = 'Century Gothic'
-          Font.Style = [fsBold]
-          Frame.Style = fsDouble
-          Frame.Typ = [ftTop]
-          HAlign = haRight
-          Memo.UTF8 = (
-            'Debit')
-          ParentFont = False
-          VAlign = vaCenter
-        end
-        object Memo12: TfrxMemoView
-          Align = baWidth
-          Top = 18.897650000000000000
-          Width = 755.906000000000000000
-          Height = 3.779527560000000000
-          StretchMode = smActualHeight
-          DisplayFormat.FormatStr = '#,#0.##'
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clBlack
-          Font.Height = -13
-          Font.Name = 'Century Gothic'
-          Font.Style = []
-          Frame.Typ = [ftTop]
-          ParentFont = False
-          VAlign = vaCenter
-        end
-        object Memo13: TfrxMemoView
-          Top = 22.677180000000000000
-          Width = 113.385900000000000000
-          Height = 18.897637800000000000
-          StretchMode = smActualHeight
-          DataSet = DS_KasKeluar
-          DataSetName = 'DS_KasKeluar'
-          DisplayFormat.FormatStr = 'dd MMM yyyy'
-          DisplayFormat.Kind = fkDateTime
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clBlack
-          Font.Height = -11
-          Font.Name = 'Century Gothic'
-          Font.Style = []
-          Frame.Width = 2.000000000000000000
-          Memo.UTF8 = (
-            '[DS_KasKeluar."tgltransaksi"]')
-          ParentFont = False
-        end
-      end
-      object GroupFooter1: TfrxGroupFooter
-        FillType = ftBrush
-        Height = 22.677180000000000000
-        Top = 298.582870000000000000
-        Width = 755.906000000000000000
-        object Memo18: TfrxMemoView
-          Align = baWidth
-          Width = 755.906000000000000000
-          Height = 3.779527560000000000
-          StretchMode = smActualHeight
-          DisplayFormat.FormatStr = '#,#0.##'
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clBlack
-          Font.Height = -13
-          Font.Name = 'Century Gothic'
-          Font.Style = []
-          Frame.Typ = [ftTop]
-          ParentFont = False
-          VAlign = vaCenter
-        end
-      end
-    end
   end
   object Rpt_BukuKas: TfrxReport
     Version = '5.2.3'
@@ -37469,23 +37086,19 @@ object DM: TDM
     SQL.Strings = (
       
         'SELECT a.*,IFNULL(b.kodeakun,'#39#39')AS kodeakun,IFNULL(b.namaakun,'#39#39 +
-        ')AS namaakun,b.kas FROM'
+        ')AS namaakun FROM'
       
-        '(SELECT a.*,b.noakun,b.debit AS masuk, b.kredit AS keluar, b.kur' +
-        's FROM'
+        '(SELECT a.*,IFNULL(b.kodeakun,'#39#39')AS kodekas,IFNULL(b.namaakun,'#39#39 +
+        ')AS namakas FROM'
+      '(SELECT a.*,b.noakun AS akun,b.jumlah,b.memo FROM'
       
-        '(SELECT a.nokas,b.tgltransaksi,b.tipe,b.noreferensi,b.keterangan' +
-        ' FROM'
-      '(SELECT noakun AS nokas FROM tbl_akun WHERE kas=1)AS a'
-      'LEFT JOIN tbl_bukubesarakun AS b ON b.noakun=a.nokas)AS a'
+        '(SELECT * FROM tbl_penerimaanlain WHERE tgltransaksi BETWEEN :tk' +
+        'd AND :tks)AS a'
       
-        'LEFT JOIN tbl_bukubesarakun AS b ON b.tipe=a.tipe AND b.norefere' +
-        'nsi=a.noreferensi)AS a'
-      
-        'LEFT JOIN tbl_akun AS b ON b.noakun=a.noakun HAVING a.tgltransak' +
-        'si IS NOT NULL and  a.tgltransaksi between :tkd and :tks AND (a.' +
-        'tipe='#39'SA'#39' OR a.tipe='#39'CR'#39' OR a.tipe='#39'CI'#39') ORDER BY a.tgltransaksi' +
-        ',a.tipe,a.noreferensi,b.kas desc')
+        'LEFT JOIN tbl_penerimaanlaindetail AS b ON b.nopenerimaan=a.nope' +
+        'nerimaan)AS a'
+      'LEFT JOIN tbl_akun AS b ON b.noakun=a.noakun)AS a'
+      'LEFT JOIN tbl_akun AS b ON b.noakun=a.akun ')
     Params = <
       item
         DataType = ftUnknown
@@ -37599,7 +37212,7 @@ object DM: TDM
           Frame.Width = 2.000000000000000000
           HAlign = haCenter
           Memo.UTF8 = (
-            'Penerimaan Kas')
+            'Penerimaan Lain')
           ParentFont = False
           VAlign = vaCenter
         end
@@ -37635,21 +37248,19 @@ object DM: TDM
       object MasterData1: TfrxMasterData
         FillType = ftBrush
         Height = 18.897647560000000000
-        Top = 257.008040000000000000
+        Top = 283.464750000000000000
         Width = 755.906000000000000000
         DataSet = DS_KasMasuk
         DataSetName = 'DS_KasMasuk'
         RowCount = 0
         Stretched = True
         object Memo11: TfrxMemoView
-          Left = 188.976500000000000000
-          Width = 340.157700000000000000
+          Left = 94.488250000000000000
+          Width = 245.669450000000000000
           Height = 18.897637800000000000
           StretchMode = smActualHeight
-          DataField = 'namaakun'
           DataSet = DS_KasMasuk
           DataSetName = 'DS_KasMasuk'
-          DisplayFormat.FormatStr = '%2.2n'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
           Font.Height = -11
@@ -37661,32 +37272,29 @@ object DM: TDM
           ParentFont = False
         end
         object Memo2: TfrxMemoView
-          Left = 642.520100000000000000
-          Width = 113.385900000000000000
+          Left = 453.543600000000000000
+          Width = 302.362400000000000000
           Height = 18.897637800000000000
           StretchMode = smActualHeight
-          DataSet = DS_KasKeluar
-          DataSetName = 'DS_KasKeluar'
-          DisplayFormat.FormatStr = '#,#0.##'
-          DisplayFormat.Kind = fkNumeric
+          DataSet = DS_KasMasuk
+          DataSetName = 'DS_KasMasuk'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
           Font.Height = -11
           Font.Name = 'Century Gothic'
           Font.Style = []
-          Frame.Width = 2.000000000000000000
-          HAlign = haRight
+          Frame.Typ = [ftLeft]
           Memo.UTF8 = (
-            '[<DS_KasMasuk."keluar">*<DS_KasMasuk."kurs">]')
+            '[DS_KasMasuk."memo"]')
           ParentFont = False
         end
         object Memo7: TfrxMemoView
-          Left = 529.134200000000000000
+          Left = 340.157700000000000000
           Width = 113.385900000000000000
           Height = 18.897637800000000000
           StretchMode = smActualHeight
-          DataSet = DS_KasKeluar
-          DataSetName = 'DS_KasKeluar'
+          DataSet = DS_KasMasuk
+          DataSetName = 'DS_KasMasuk'
           DisplayFormat.FormatStr = '#,#0.##'
           DisplayFormat.Kind = fkNumeric
           Font.Charset = DEFAULT_CHARSET
@@ -37697,18 +37305,15 @@ object DM: TDM
           Frame.Width = 2.000000000000000000
           HAlign = haRight
           Memo.UTF8 = (
-            '[<DS_KasMasuk."masuk">*<DS_KasMasuk."kurs">]')
+            '[DS_KasMasuk."jumlah"]')
           ParentFont = False
         end
         object Memo10: TfrxMemoView
-          Left = 113.385900000000000000
-          Width = 75.590600000000000000
+          Width = 94.488250000000000000
           Height = 18.897637800000000000
           StretchMode = smActualHeight
-          DataField = 'kodeakun'
           DataSet = DS_KasMasuk
           DataSetName = 'DS_KasMasuk'
-          DisplayFormat.FormatStr = '%2.2n'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
           Font.Height = -11
@@ -37723,7 +37328,7 @@ object DM: TDM
       object PageFooter1: TfrxPageFooter
         FillType = ftBrush
         Height = 26.456710000000000000
-        Top = 381.732530000000000000
+        Top = 419.527830000000000000
         Width = 755.906000000000000000
         object Memo52: TfrxMemoView
           Align = baWidth
@@ -37757,133 +37362,121 @@ object DM: TDM
       end
       object GroupHeader2: TfrxGroupHeader
         FillType = ftBrush
-        Height = 41.574817800000000000
+        Height = 68.031527800000000000
         Top = 192.756030000000000000
         Width = 755.906000000000000000
-        Condition = 'DS_KasMasuk."noreferensi"'
-        object Memo3: TfrxMemoView
-          Left = 113.385900000000000000
-          Top = 22.677180000000000000
-          Width = 642.520100000000000000
+        Condition = 'DS_KasMasuk."nopenerimaan"'
+        object Memo14: TfrxMemoView
+          Left = 94.488250000000000000
+          Top = 49.133890000000000000
+          Width = 245.669327950000000000
           Height = 18.897637800000000000
-          StretchMode = smActualHeight
-          DataSet = DS_KasKeluar
-          DataSetName = 'DS_KasKeluar'
           Font.Charset = DEFAULT_CHARSET
-          Font.Color = clBlack
+          Font.Color = clNavy
           Font.Height = -11
           Font.Name = 'Century Gothic'
           Font.Style = []
-          Frame.Width = 2.000000000000000000
+          Frame.Color = clMaroon
+          Frame.Style = fsDouble
+          Frame.Typ = [ftTop, ftBottom]
+          HAlign = haCenter
           Memo.UTF8 = (
-            '[DS_KasMasuk."keterangan"]')
+            'Nama')
           ParentFont = False
         end
-        object Memo5: TfrxMemoView
+        object Memo26: TfrxMemoView
+          Left = 340.157700000000000000
+          Top = 49.133890000000000000
           Width = 113.385777950000000000
           Height = 18.897637800000000000
           Font.Charset = DEFAULT_CHARSET
-          Font.Color = clBlack
+          Font.Color = clNavy
           Font.Height = -11
-          Font.Name = 'Century Gothic'
-          Font.Style = [fsBold]
-          Frame.Style = fsDouble
-          Frame.Typ = [ftTop]
-          Memo.UTF8 = (
-            'Tanggal')
-          ParentFont = False
-          VAlign = vaCenter
-        end
-        object Memo6: TfrxMemoView
-          Left = 642.520100000000000000
-          Width = 113.385777950000000000
-          Height = 18.897637800000000000
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clBlack
-          Font.Height = -11
-          Font.Name = 'Century Gothic'
-          Font.Style = [fsBold]
-          Frame.Style = fsDouble
-          Frame.Typ = [ftTop]
-          HAlign = haRight
-          Memo.UTF8 = (
-            'Kredit')
-          ParentFont = False
-          VAlign = vaCenter
-        end
-        object Memo8: TfrxMemoView
-          Left = 113.385900000000000000
-          Width = 415.748177950000000000
-          Height = 18.897637800000000000
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clBlack
-          Font.Height = -11
-          Font.Name = 'Century Gothic'
-          Font.Style = [fsBold]
-          Frame.Style = fsDouble
-          Frame.Typ = [ftTop]
-          Memo.UTF8 = (
-            'Deskripsi')
-          ParentFont = False
-          VAlign = vaCenter
-        end
-        object Memo9: TfrxMemoView
-          Left = 529.134200000000000000
-          Width = 113.385777950000000000
-          Height = 18.897637800000000000
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clBlack
-          Font.Height = -11
-          Font.Name = 'Century Gothic'
-          Font.Style = [fsBold]
-          Frame.Style = fsDouble
-          Frame.Typ = [ftTop]
-          HAlign = haRight
-          Memo.UTF8 = (
-            'Debit')
-          ParentFont = False
-          VAlign = vaCenter
-        end
-        object Memo12: TfrxMemoView
-          Align = baWidth
-          Top = 18.897650000000000000
-          Width = 755.906000000000000000
-          Height = 3.779527560000000000
-          StretchMode = smActualHeight
-          DisplayFormat.FormatStr = '#,#0.##'
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clBlack
-          Font.Height = -13
           Font.Name = 'Century Gothic'
           Font.Style = []
-          Frame.Typ = [ftTop]
+          Frame.Color = clMaroon
+          Frame.Style = fsDouble
+          Frame.Typ = [ftTop, ftBottom]
+          HAlign = haCenter
+          Memo.UTF8 = (
+            'Jumlah')
           ParentFont = False
-          VAlign = vaCenter
         end
-        object Memo13: TfrxMemoView
-          Top = 22.677180000000000000
-          Width = 113.385900000000000000
+        object Memo15: TfrxMemoView
+          Left = 453.543600000000000000
+          Top = 49.133890000000000000
+          Width = 302.362277950000000000
           Height = 18.897637800000000000
-          StretchMode = smActualHeight
-          DataSet = DS_KasKeluar
-          DataSetName = 'DS_KasKeluar'
-          DisplayFormat.FormatStr = 'dd MMM yyyy'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clNavy
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Color = clMaroon
+          Frame.Style = fsDouble
+          Frame.Typ = [ftTop, ftBottom]
+          HAlign = haCenter
+          Memo.UTF8 = (
+            'Memo')
+          ParentFont = False
+        end
+        object Memo17: TfrxMemoView
+          Left = 3.779530000000000000
+          Top = 3.779530000000000000
+          Width = 336.378170000000000000
+          Height = 18.897650000000000000
+          Memo.UTF8 = (
+            'No. Referensi : [DS_KasMasuk."kodepenerimaan"]')
+        end
+        object Memo19: TfrxMemoView
+          Left = 3.779530000000000000
+          Top = 22.677180000000000000
+          Width = 336.378170000000000000
+          Height = 18.897650000000000000
+          DisplayFormat.FormatStr = 'dd MMMM yyyy'
+          DisplayFormat.Kind = fkDateTime
+          Memo.UTF8 = (
+            'Tgl. Transaksi : [DS_KasMasuk."tgltransaksi"]')
+        end
+        object Memo44: TfrxMemoView
+          Top = 49.133890000000000000
+          Width = 94.488127950000000000
+          Height = 18.897637800000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clNavy
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Color = clMaroon
+          Frame.Style = fsDouble
+          Frame.Typ = [ftTop, ftBottom]
+          HAlign = haCenter
+          Memo.UTF8 = (
+            'Kode')
+          ParentFont = False
+        end
+        object Memo23: TfrxMemoView
+          Left = 389.291590000000000000
+          Top = 3.779530000000000000
+          Width = 362.834880000000000000
+          Height = 18.897650000000000000
+          DisplayFormat.FormatStr = 'dd MMMM yyyy'
           DisplayFormat.Kind = fkDateTime
           Font.Charset = DEFAULT_CHARSET
-          Font.Color = clBlack
+          Font.Color = clNavy
           Font.Height = -11
           Font.Name = 'Century Gothic'
           Font.Style = []
-          Frame.Width = 2.000000000000000000
+          HAlign = haRight
           Memo.UTF8 = (
-            '[DS_KasMasuk."tgltransaksi"]')
+            '[DS_KasMasuk."kodekas"] | [DS_KasMasuk."namakas"]')
           ParentFont = False
         end
       end
       object GroupFooter1: TfrxGroupFooter
         FillType = ftBrush
-        Height = 22.677180000000000000
-        Top = 298.582870000000000000
+        Height = 34.015770000000000000
+        Top = 325.039580000000000000
         Width = 755.906000000000000000
         object Memo18: TfrxMemoView
           Align = baWidth
@@ -37897,6 +37490,58 @@ object DM: TDM
           Font.Name = 'Century Gothic'
           Font.Style = []
           Frame.Typ = [ftTop]
+          ParentFont = False
+          VAlign = vaCenter
+        end
+        object Memo25: TfrxMemoView
+          Left = 563.149970000000000000
+          Top = 3.779530000000000000
+          Width = 79.370007950000000000
+          Height = 18.897637800000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -13
+          Font.Name = 'Century Gothic'
+          Font.Style = [fsBold, fsItalic]
+          Frame.Style = fsDouble
+          Memo.UTF8 = (
+            'Total :')
+          ParentFont = False
+        end
+        object Memo28: TfrxMemoView
+          Left = 642.520100000000000000
+          Top = 3.779530000000000000
+          Width = 113.385900000000000000
+          Height = 18.897637800000000000
+          StretchMode = smActualHeight
+          DataSetName = 'DSPembelianBarangSupplierFaktur'
+          DisplayFormat.FormatStr = '#,#0.##'
+          DisplayFormat.Kind = fkNumeric
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -13
+          Font.Name = 'Century Gothic'
+          Font.Style = [fsBold, fsItalic]
+          Frame.Width = 2.000000000000000000
+          HAlign = haRight
+          Memo.UTF8 = (
+            '[DS_KasMasuk."total"]')
+          ParentFont = False
+        end
+        object Memo3: TfrxMemoView
+          Align = baWidth
+          Top = 30.236240000000000000
+          Width = 755.906000000000000000
+          Height = 3.779527560000000000
+          StretchMode = smActualHeight
+          DisplayFormat.FormatStr = '#,#0.##'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -13
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Style = fsDot
+          Frame.Typ = [ftBottom]
           ParentFont = False
           VAlign = vaCenter
         end
@@ -67876,7 +67521,7 @@ object DM: TDM
       
         'LEFT JOIN tbl_penjualaninvoicedetail AS d ON d.nopenjualaninvoic' +
         'e=c.nopenjualan'
-      'UNION'
+      'UNION all'
       
         'SELECT c.*,d.nobarang,d.qty*d.nilai AS qty,d.hargajual,d.dppbara' +
         'ng,d.ppnbarang,d.tipepajak,d.persenpajak FROM'
@@ -68059,7 +67704,9 @@ object DM: TDM
           Font.Name = 'Arial'
           Font.Style = []
           Memo.UTF8 = (
-            '[DSFakturKeluar."npwp"]')
+            
+              '[IIF(<DSFakturKeluar."npwp">='#39#39','#39'000000000000000'#39',<DSFakturKelua' +
+              'r."npwp">)]')
           ParentFont = False
           WordWrap = False
         end
@@ -69667,30 +69314,24 @@ object DM: TDM
         '(SELECT a.*,IFNULL(b.kodepenjualankirim,'#39#39')AS kodepenjualankirim' +
         ',IFNULL(b.nopenjualanorder,'#39#39')AS nopenjualanorder FROM'
       
-        '(SELECT a.*,IFNULL(b.total,0)AS totalretur,a.total-IFNULL(b.tota' +
-        'l,0) AS totalomset,IFNULL(b.kodereturpenjualan,'#39#39')AS kodereturpe' +
-        'njualan FROM'
-      
         '(SELECT nopenjualaninvoice AS noref,kodepenjualaninvoice AS kode' +
         'ref,tglpenjualaninvoice AS tgltransaksi,nopenjualankirim,nokonta' +
         'k,total FROM tbl_penjualaninvoice where tglpenjualaninvoice betw' +
-        'een :tkd and :tks)AS a'
-      
-        'LEFT JOIN tbl_returpenjualan AS b ON b.nopenjualaninvoice=a.nore' +
-        'f'
+        'een :tkd and :tks'
       'UNION'
       
         'SELECT nopenjualantunai AS noref,kodepenjualantunai AS koderef,t' +
-        'gltransaksi, 0 AS nopenjualankirim,nokontak,total,0 AS totalretu' +
-        'r,total-0 AS totalomset,'#39#39' AS kodereturpenjualan FROM tbl_penjua' +
-        'lantunai  where tgltransaksi between :tkd and :tks)AS a'
+        'gltransaksi, 0 AS nopenjualankirim,nokontak,total FROM tbl_penju' +
+        'alantunai  where tgltransaksi between :tkd and :tks)AS a'
       
         'LEFT JOIN tbl_penjualankirim AS b ON b.nopenjualankirim=a.nopenj' +
         'ualankirim)AS a'
       
         'LEFT JOIN tbl_penjualanorder AS b ON b.nopenjualanorder=a.nopenj' +
         'ualanorder)AS a'
-      'LEFT JOIN tbl_kontak AS b ON b.nokontak=a.nokontak')
+      
+        'LEFT JOIN tbl_kontak AS b ON b.nokontak=a.nokontak order by a.tg' +
+        'ltransaksi')
     Params = <
       item
         DataType = ftUnknown
@@ -69747,6 +69388,10 @@ object DM: TDM
         DataSetName = 'DSPenjualanRangkuman3'
       end
       item
+        DataSet = DSPenjualanRangkuman3Retur
+        DataSetName = 'DSPenjualanRangkuman3Retur'
+      end
+      item
         DataSet = DSPerusahaan
         DataSetName = 'DSPerusahaan'
       end>
@@ -69762,9 +69407,9 @@ object DM: TDM
       Font.Height = -11
       Font.Name = 'Century Gothic'
       Font.Style = []
-      PaperWidth = 356.000000000000000000
-      PaperHeight = 216.000000000000000000
-      PaperSize = 256
+      PaperWidth = 210.000000000000000000
+      PaperHeight = 297.000000000000000000
+      PaperSize = 9
       LeftMargin = 5.000000000000000000
       RightMargin = 5.000000000000000000
       TopMargin = 5.000000000000000000
@@ -69773,11 +69418,11 @@ object DM: TDM
         FillType = ftBrush
         Height = 113.385882910000000000
         Top = 18.897650000000000000
-        Width = 1307.717380000000000000
+        Width = 755.906000000000000000
         object Memo1: TfrxMemoView
           Align = baWidth
           Top = 18.897650000000000000
-          Width = 1307.717380000000000000
+          Width = 755.906000000000000000
           Height = 26.456692910000000000
           AutoWidth = True
           Font.Charset = DEFAULT_CHARSET
@@ -69794,7 +69439,7 @@ object DM: TDM
         object Memo4: TfrxMemoView
           Align = baWidth
           Top = 45.354360000000000000
-          Width = 1307.717380000000000000
+          Width = 755.906000000000000000
           Height = 26.456692910000000000
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clNavy
@@ -69824,7 +69469,7 @@ object DM: TDM
         object txtperiode: TfrxMemoView
           Align = baWidth
           Top = 71.811070000000000000
-          Width = 1307.717380000000000000
+          Width = 755.906000000000000000
           Height = 18.897637800000000000
           AutoWidth = True
           Font.Charset = DEFAULT_CHARSET
@@ -69840,8 +69485,8 @@ object DM: TDM
       object MasterData1: TfrxMasterData
         FillType = ftBrush
         Height = 22.677177560000000000
-        Top = 238.110390000000000000
-        Width = 1307.717380000000000000
+        Top = 257.008040000000000000
+        Width = 755.906000000000000000
         DataSet = DSPenjualanRangkuman3
         DataSetName = 'DSPenjualanRangkuman3'
         RowCount = 0
@@ -69865,26 +69510,8 @@ object DM: TDM
             '[DSPenjualanRangkuman3."tgltransaksi"]')
           ParentFont = False
         end
-        object Memo27: TfrxMemoView
-          Left = 75.590600000000000000
-          Width = 94.488188980000000000
-          Height = 18.897637800000000000
-          StretchMode = smActualHeight
-          DataField = 'kodepenjualanorder'
-          DataSet = DSPenjualanRangkuman3
-          DataSetName = 'DSPenjualanRangkuman3'
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clBlack
-          Font.Height = -11
-          Font.Name = 'Century Gothic'
-          Font.Style = []
-          Frame.Width = 2.000000000000000000
-          Memo.UTF8 = (
-            '[DSPenjualanRangkuman3."kodepenjualanorder"]')
-          ParentFont = False
-        end
         object Memo10: TfrxMemoView
-          Left = 548.031850000000000000
+          Left = 170.078850000000000000
           Width = 476.220780000000000000
           Height = 18.897637800000000000
           StretchMode = smActualHeight
@@ -69908,8 +69535,8 @@ object DM: TDM
             end>
         end
         object Memo23: TfrxMemoView
-          Left = 1024.252630000000000000
-          Width = 94.488188980000000000
+          Left = 646.299630000000000000
+          Width = 109.606308980000000000
           Height = 18.897637800000000000
           StretchMode = smActualHeight
           DataField = 'total'
@@ -69928,25 +69555,8 @@ object DM: TDM
             '[DSPenjualanRangkuman3."total"]')
           ParentFont = False
         end
-        object Memo20: TfrxMemoView
-          Left = 264.567100000000000000
-          Width = 94.488188980000000000
-          Height = 18.897637800000000000
-          StretchMode = smActualHeight
-          DataSet = DSPenjualanRangkuman3
-          DataSetName = 'DSPenjualanRangkuman3'
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clBlack
-          Font.Height = -11
-          Font.Name = 'Century Gothic'
-          Font.Style = []
-          Frame.Width = 2.000000000000000000
-          Memo.UTF8 = (
-            '[DSPenjualanRangkuman3."kodepenjualankirim"]')
-          ParentFont = False
-        end
         object Memo21: TfrxMemoView
-          Left = 359.055350000000000000
+          Left = 75.590600000000000000
           Width = 94.488188980000000000
           Height = 18.897637800000000000
           StretchMode = smActualHeight
@@ -69962,92 +69572,15 @@ object DM: TDM
             '[DSPenjualanRangkuman3."koderef"]')
           ParentFont = False
         end
-        object Memo22: TfrxMemoView
-          Left = 170.078850000000000000
-          Width = 94.488188980000000000
-          Height = 18.897637800000000000
-          StretchMode = smActualHeight
-          DataSet = DSPenjualanRangkuman3
-          DataSetName = 'DSPenjualanRangkuman3'
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clBlack
-          Font.Height = -11
-          Font.Name = 'Century Gothic'
-          Font.Style = []
-          Frame.Width = 2.000000000000000000
-          Memo.UTF8 = (
-            '[DSPenjualanRangkuman3."kodepenjualando"]')
-          ParentFont = False
-        end
-        object Memo2: TfrxMemoView
-          Left = 1118.740880000000000000
-          Width = 94.488188980000000000
-          Height = 18.897637800000000000
-          StretchMode = smActualHeight
-          DataField = 'totalretur'
-          DataSet = DSPenjualanRangkuman3
-          DataSetName = 'DSPenjualanRangkuman3'
-          DisplayFormat.FormatStr = '#,#0.##'
-          DisplayFormat.Kind = fkNumeric
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clBlack
-          Font.Height = -11
-          Font.Name = 'Century Gothic'
-          Font.Style = []
-          Frame.Width = 2.000000000000000000
-          HAlign = haRight
-          Memo.UTF8 = (
-            '[DSPenjualanRangkuman3."totalretur"]')
-          ParentFont = False
-        end
-        object Memo13: TfrxMemoView
-          Left = 1213.229130000000000000
-          Width = 94.488188980000000000
-          Height = 18.897637800000000000
-          StretchMode = smActualHeight
-          DataField = 'totalomset'
-          DataSet = DSPenjualanRangkuman3
-          DataSetName = 'DSPenjualanRangkuman3'
-          DisplayFormat.FormatStr = '#,#0.##'
-          DisplayFormat.Kind = fkNumeric
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clBlack
-          Font.Height = -11
-          Font.Name = 'Century Gothic'
-          Font.Style = []
-          Frame.Width = 2.000000000000000000
-          HAlign = haRight
-          Memo.UTF8 = (
-            '[DSPenjualanRangkuman3."totalomset"]')
-          ParentFont = False
-        end
-        object Memo17: TfrxMemoView
-          Left = 453.543600000000000000
-          Width = 94.488188980000000000
-          Height = 18.897637800000000000
-          StretchMode = smActualHeight
-          DataField = 'kodereturpenjualan'
-          DataSet = DSPenjualanRangkuman3
-          DataSetName = 'DSPenjualanRangkuman3'
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clBlack
-          Font.Height = -11
-          Font.Name = 'Century Gothic'
-          Font.Style = []
-          Frame.Width = 2.000000000000000000
-          Memo.UTF8 = (
-            '[DSPenjualanRangkuman3."kodereturpenjualan"]')
-          ParentFont = False
-        end
       end
       object PageFooter1: TfrxPageFooter
         FillType = ftBrush
         Height = 26.456710000000000000
-        Top = 498.897960000000000000
-        Width = 1307.717380000000000000
+        Top = 755.906000000000000000
+        Width = 755.906000000000000000
         object Memo52: TfrxMemoView
           Align = baWidth
-          Width = 1307.717380000000000000
+          Width = 755.906000000000000000
           Height = 3.779527560000000000
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -70077,27 +69610,12 @@ object DM: TDM
       object ReportSummary1: TfrxReportSummary
         FillType = ftBrush
         Height = 154.960730000000000000
-        Top = 321.260050000000000000
-        Width = 1307.717380000000000000
-        object Memo38: TfrxMemoView
-          Left = 975.118740000000000000
-          Top = 7.559060000000000000
-          Width = 49.133767950000000000
-          Height = 18.897637800000000000
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clBlack
-          Font.Height = -11
-          Font.Name = 'Century Gothic'
-          Font.Style = [fsBold]
-          Frame.Style = fsDouble
-          Memo.UTF8 = (
-            'Total :')
-          ParentFont = False
-        end
+        Top = 578.268090000000000000
+        Width = 755.906000000000000000
         object Memo39: TfrxMemoView
           Align = baWidth
           Top = 26.456710000000000000
-          Width = 1307.717380000000000000
+          Width = 755.906000000000000000
           Height = 3.779527560000000000
           StretchMode = smActualHeight
           DisplayFormat.FormatStr = '#,#0.##'
@@ -70115,7 +69633,7 @@ object DM: TDM
         object Memo40: TfrxMemoView
           Align = baWidth
           Top = 3.779530000000000000
-          Width = 1307.717380000000000000
+          Width = 755.906000000000000000
           Height = 3.779527560000000000
           StretchMode = smActualHeight
           DisplayFormat.FormatStr = '#,#0.##'
@@ -70131,7 +69649,7 @@ object DM: TDM
           VAlign = vaCenter
         end
         object Memo7: TfrxMemoView
-          Left = 1213.229130000000000000
+          Left = 646.299630000000000000
           Top = 7.559060000000000000
           Width = 94.488188980000000000
           Height = 18.897637800000000000
@@ -70148,34 +69666,380 @@ object DM: TDM
           Frame.Width = 2.000000000000000000
           HAlign = haRight
           Memo.UTF8 = (
-            '[SUM(<DSPenjualanRangkuman3."totalomset">,MasterData1)]')
+            
+              '[<SUM(<DSPenjualanRangkuman3."total">,MasterData1)>-<SUM(<DSPenj' +
+              'ualanRangkuman3Retur."total">,MasterData2)>]')
           ParentFont = False
         end
         object Memo25: TfrxMemoView
-          Left = 1118.740880000000000000
+          Left = 551.811380000000000000
           Top = 7.559060000000000000
           Width = 94.488188980000000000
           Height = 18.897637800000000000
           StretchMode = smActualHeight
           DataSet = DSPenjualanRangkuman3
           DataSetName = 'DSPenjualanRangkuman3'
-          DisplayFormat.FormatStr = '#,#0.##'
-          DisplayFormat.Kind = fkNumeric
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
           Font.Height = -11
           Font.Name = 'Century Gothic'
           Font.Style = [fsBold]
           Frame.Width = 2.000000000000000000
-          HAlign = haRight
           Memo.UTF8 = (
-            '[SUM(<DSPenjualanRangkuman3."totalretur">,MasterData1)]')
+            'Total Omset :')
           ParentFont = False
         end
-        object Memo28: TfrxMemoView
-          Left = 1024.252630000000000000
-          Top = 7.559060000000000000
+        object Memo30: TfrxMemoView
+          Left = 374.173470000000000000
+          Top = 37.795300000000000000
+          Width = 102.047310000000000000
+          Height = 18.897650000000000000
+          Memo.UTF8 = (
+            'Dibuat Oleh,')
+        end
+        object Memo31: TfrxMemoView
+          Left = 510.236550000000000000
+          Top = 37.795300000000000000
+          Width = 102.047310000000000000
+          Height = 18.897650000000000000
+          Memo.UTF8 = (
+            'Diketahui Oleh,')
+        end
+        object Memo32: TfrxMemoView
+          Left = 650.079160000000000000
+          Top = 37.795300000000000000
+          Width = 102.047310000000000000
+          Height = 18.897650000000000000
+          Memo.UTF8 = (
+            'Disetujui Oleh,')
+        end
+        object Memo33: TfrxMemoView
+          Left = 374.173470000000000000
+          Top = 132.283550000000000000
+          Width = 102.047310000000000000
+          Height = 18.897650000000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Typ = [ftTop]
+          Memo.UTF8 = (
+            'Tanggal:')
+          ParentFont = False
+        end
+        object Memo34: TfrxMemoView
+          Left = 510.236550000000000000
+          Top = 132.283550000000000000
+          Width = 102.047310000000000000
+          Height = 18.897650000000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Typ = [ftTop]
+          Memo.UTF8 = (
+            'Tanggal:')
+          ParentFont = False
+        end
+        object Memo35: TfrxMemoView
+          Left = 650.079160000000000000
+          Top = 132.283550000000000000
+          Width = 102.047310000000000000
+          Height = 18.897650000000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Typ = [ftTop]
+          Memo.UTF8 = (
+            'Tanggal:')
+          ParentFont = False
+        end
+      end
+      object Header1: TfrxHeader
+        FillType = ftBrush
+        Height = 41.574817800000000000
+        Top = 192.756030000000000000
+        Width = 755.906000000000000000
+        object Memo5: TfrxMemoView
+          Top = 22.677180000000000000
+          Width = 75.590477950000000000
+          Height = 18.897637800000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clNavy
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Color = clMaroon
+          Frame.Style = fsDouble
+          Frame.Typ = [ftTop, ftBottom]
+          HAlign = haCenter
+          Memo.UTF8 = (
+            'Tanggal')
+          ParentFont = False
+        end
+        object Memo3: TfrxMemoView
+          Left = 170.078850000000000000
+          Top = 22.677180000000000000
+          Width = 476.220657950000000000
+          Height = 18.897637800000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clNavy
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Color = clMaroon
+          Frame.Style = fsDouble
+          Frame.Typ = [ftTop, ftBottom]
+          HAlign = haCenter
+          Memo.UTF8 = (
+            'Customer')
+          ParentFont = False
+        end
+        object Memo14: TfrxMemoView
+          Left = 646.299630000000000000
+          Top = 22.677180000000000000
+          Width = 109.606308980000000000
+          Height = 18.897637800000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clNavy
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Color = clMaroon
+          Frame.Style = fsDouble
+          Frame.Typ = [ftTop, ftBottom]
+          HAlign = haCenter
+          Memo.UTF8 = (
+            'Total Penjualan')
+          ParentFont = False
+        end
+        object Memo9: TfrxMemoView
+          Left = 75.590600000000000000
+          Top = 22.677180000000000000
           Width = 94.488188980000000000
+          Height = 18.897637800000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clNavy
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Color = clMaroon
+          Frame.Style = fsDouble
+          Frame.Typ = [ftTop, ftBottom]
+          HAlign = haCenter
+          Memo.UTF8 = (
+            'No.Faktur ')
+          ParentFont = False
+        end
+        object Memo19: TfrxMemoView
+          Align = baWidth
+          Width = 755.906000000000000000
+          Height = 18.897650000000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clNavy
+          Font.Height = -16
+          Font.Name = 'Century Gothic'
+          Font.Style = [fsBold, fsItalic]
+          HAlign = haCenter
+          Memo.UTF8 = (
+            'PENJUALAN')
+          ParentFont = False
+        end
+      end
+      object Header2: TfrxHeader
+        FillType = ftBrush
+        Height = 56.692950000000000000
+        Top = 359.055350000000000000
+        Width = 755.906000000000000000
+        object Memo18: TfrxMemoView
+          Top = 34.015770000000000000
+          Width = 75.590477950000000000
+          Height = 18.897637800000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clNavy
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Color = clMaroon
+          Frame.Style = fsDouble
+          Frame.Typ = [ftTop, ftBottom]
+          HAlign = haCenter
+          Memo.UTF8 = (
+            'Tanggal')
+          ParentFont = False
+        end
+        object Memo24: TfrxMemoView
+          Left = 170.078850000000000000
+          Top = 34.015770000000000000
+          Width = 476.220657950000000000
+          Height = 18.897637800000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clNavy
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Color = clMaroon
+          Frame.Style = fsDouble
+          Frame.Typ = [ftTop, ftBottom]
+          HAlign = haCenter
+          Memo.UTF8 = (
+            'Customer')
+          ParentFont = False
+        end
+        object Memo42: TfrxMemoView
+          Left = 646.299630000000000000
+          Top = 34.015770000000000000
+          Width = 109.606308980000000000
+          Height = 18.897637800000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clNavy
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Color = clMaroon
+          Frame.Style = fsDouble
+          Frame.Typ = [ftTop, ftBottom]
+          HAlign = haCenter
+          Memo.UTF8 = (
+            'Total Retur')
+          ParentFont = False
+        end
+        object Memo44: TfrxMemoView
+          Left = 75.590600000000000000
+          Top = 34.015770000000000000
+          Width = 94.488188980000000000
+          Height = 18.897637800000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clNavy
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Color = clMaroon
+          Frame.Style = fsDouble
+          Frame.Typ = [ftTop, ftBottom]
+          HAlign = haCenter
+          Memo.UTF8 = (
+            'No. Retur')
+          ParentFont = False
+        end
+        object Memo20: TfrxMemoView
+          Align = baWidth
+          Top = 11.338590000000000000
+          Width = 755.906000000000000000
+          Height = 18.897650000000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clNavy
+          Font.Height = -16
+          Font.Name = 'Century Gothic'
+          Font.Style = [fsBold, fsItalic]
+          HAlign = haCenter
+          Memo.UTF8 = (
+            'RETUR PENJUALAN')
+          ParentFont = False
+        end
+      end
+      object MasterData2: TfrxMasterData
+        FillType = ftBrush
+        Height = 22.677180000000000000
+        Top = 438.425480000000000000
+        Width = 755.906000000000000000
+        DataSet = DSPenjualanRangkuman3Retur
+        DataSetName = 'DSPenjualanRangkuman3Retur'
+        RowCount = 0
+        object Memo2: TfrxMemoView
+          Left = 646.299630000000000000
+          Width = 109.606308980000000000
+          Height = 18.897637800000000000
+          StretchMode = smActualHeight
+          DataSet = DSPenjualanRangkuman3Retur
+          DataSetName = 'DSPenjualanRangkuman3Retur'
+          DisplayFormat.FormatStr = '#,#0.##'
+          DisplayFormat.Kind = fkNumeric
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Width = 2.000000000000000000
+          HAlign = haRight
+          Memo.UTF8 = (
+            '[DSPenjualanRangkuman3Retur."total"]')
+          ParentFont = False
+        end
+        object Memo8: TfrxMemoView
+          Width = 75.590600000000000000
+          Height = 18.897637800000000000
+          StretchMode = smActualHeight
+          DataField = 'tgltransaksi'
+          DataSet = DSPenjualanRangkuman3Retur
+          DataSetName = 'DSPenjualanRangkuman3Retur'
+          DisplayFormat.FormatStr = 'dd MMM yyyy'
+          DisplayFormat.Kind = fkDateTime
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Width = 2.000000000000000000
+          Memo.UTF8 = (
+            '[DSPenjualanRangkuman3Retur."tgltransaksi"]')
+          ParentFont = False
+        end
+        object Memo12: TfrxMemoView
+          Left = 170.078850000000000000
+          Width = 476.220780000000000000
+          Height = 18.897637800000000000
+          StretchMode = smActualHeight
+          DataField = 'namakontak'
+          DataSet = DSPenjualanRangkuman3Retur
+          DataSetName = 'DSPenjualanRangkuman3Retur'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Width = 2.000000000000000000
+          Memo.UTF8 = (
+            '[DSPenjualanRangkuman3Retur."namakontak"]')
+          ParentFont = False
+          Formats = <
+            item
+            end
+            item
+            end>
+        end
+        object Memo13: TfrxMemoView
+          Left = 75.590600000000000000
+          Width = 94.488188980000000000
+          Height = 18.897637800000000000
+          StretchMode = smActualHeight
+          DataField = 'kodereturpenjualan'
+          DataSet = DSPenjualanRangkuman3Retur
+          DataSetName = 'DSPenjualanRangkuman3Retur'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Width = 2.000000000000000000
+          Memo.UTF8 = (
+            '[DSPenjualanRangkuman3Retur."kodereturpenjualan"]')
+          ParentFont = False
+        end
+      end
+      object Footer1: TfrxFooter
+        FillType = ftBrush
+        Height = 34.015757800000000000
+        Top = 302.362400000000000000
+        Width = 755.906000000000000000
+        object Memo28: TfrxMemoView
+          Left = 646.299630000000000000
+          Top = 7.559060000000000000
+          Width = 109.606308980000000000
           Height = 18.897637800000000000
           StretchMode = smActualHeight
           DataSet = DSPenjualanRangkuman3
@@ -70193,33 +70057,458 @@ object DM: TDM
             '[SUM(<DSPenjualanRangkuman3."total">,MasterData1)]')
           ParentFont = False
         end
+        object Memo15: TfrxMemoView
+          Left = 597.165740000000000000
+          Top = 7.559060000000000000
+          Width = 49.133767950000000000
+          Height = 18.897637800000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = [fsBold]
+          Frame.Style = fsDouble
+          Memo.UTF8 = (
+            'Total :')
+          ParentFont = False
+        end
+        object Memo17: TfrxMemoView
+          Align = baWidth
+          Top = 3.779530000000000000
+          Width = 755.906000000000000000
+          Height = 3.779527560000000000
+          StretchMode = smActualHeight
+          DisplayFormat.FormatStr = '#,#0.##'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -13
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Color = clMaroon
+          Frame.Typ = [ftTop]
+          Frame.Width = 2.000000000000000000
+          ParentFont = False
+          VAlign = vaCenter
+        end
+      end
+      object Footer2: TfrxFooter
+        FillType = ftBrush
+        Height = 34.015770000000000000
+        Top = 483.779840000000000000
+        Width = 755.906000000000000000
+        object Memo38: TfrxMemoView
+          Left = 597.165740000000000000
+          Top = 3.779530000000000000
+          Width = 49.133767950000000000
+          Height = 18.897637800000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = [fsBold]
+          Frame.Style = fsDouble
+          Memo.UTF8 = (
+            'Total :')
+          ParentFont = False
+        end
+        object Memo6: TfrxMemoView
+          Align = baWidth
+          Width = 755.906000000000000000
+          Height = 3.779527560000000000
+          StretchMode = smActualHeight
+          DisplayFormat.FormatStr = '#,#0.##'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -13
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Color = clMaroon
+          Frame.Typ = [ftTop]
+          Frame.Width = 2.000000000000000000
+          ParentFont = False
+          VAlign = vaCenter
+        end
+        object Memo16: TfrxMemoView
+          Left = 646.299630000000000000
+          Top = 3.779530000000000000
+          Width = 109.606308980000000000
+          Height = 18.897637800000000000
+          StretchMode = smActualHeight
+          DataSet = DSPenjualanRangkuman3
+          DataSetName = 'DSPenjualanRangkuman3'
+          DisplayFormat.FormatStr = '#,#0.##'
+          DisplayFormat.Kind = fkNumeric
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = [fsBold]
+          Frame.Width = 2.000000000000000000
+          HAlign = haRight
+          Memo.UTF8 = (
+            '[SUM(<DSPenjualanRangkuman3Retur."total">,MasterData1)]')
+          ParentFont = False
+        end
+      end
+    end
+  end
+  object DSPenjualanRangkuman3Retur: TfrxDBDataset
+    UserName = 'DSPenjualanRangkuman3Retur'
+    CloseDataSource = False
+    DataSet = QPenjualanRangkuman3Retur
+    BCDToCurrency = False
+    Left = 1256
+    Top = 48
+  end
+  object QPenjualanRangkuman3Retur: TZQuery
+    Connection = con
+    SQL.Strings = (
+      
+        'SELECT a.*,IFNULL(b.kodekontak,'#39#39')AS kodekontak,IFNULL(b.namakon' +
+        'tak,'#39#39')AS namakontak FROM'
+      
+        '(SELECT * FROM tbl_returpenjualan where tgltransaksi between :tk' +
+        'd and :tks)as a'
+      
+        'LEFT JOIN tbl_kontak AS b ON b.nokontak=a.nokontak order by a.tg' +
+        'ltransaksi')
+    Params = <
+      item
+        DataType = ftUnknown
+        Name = 'tkd'
+        ParamType = ptUnknown
+      end
+      item
+        DataType = ftUnknown
+        Name = 'tks'
+        ParamType = ptUnknown
+      end>
+    Left = 1288
+    Top = 48
+    ParamData = <
+      item
+        DataType = ftUnknown
+        Name = 'tkd'
+        ParamType = ptUnknown
+      end
+      item
+        DataType = ftUnknown
+        Name = 'tks'
+        ParamType = ptUnknown
+      end>
+  end
+  object Rpt_PenjualanRincian4: TfrxReport
+    Version = '5.2.3'
+    DotMatrixReport = False
+    IniFile = '\Software\Fast Reports'
+    PreviewOptions.Buttons = [pbPrint, pbLoad, pbSave, pbExport, pbZoom, pbFind, pbOutline, pbPageSetup, pbTools, pbEdit, pbNavigator, pbExportQuick]
+    PreviewOptions.Zoom = 1.000000000000000000
+    PrintOptions.Printer = 'Default'
+    PrintOptions.PrintOnSheet = 0
+    ReportOptions.CreateDate = 41624.593323761600000000
+    ReportOptions.LastChange = 41624.593323761600000000
+    ScriptLanguage = 'PascalScript'
+    ScriptText.Strings = (
+      'begin'
+      ''
+      'end.')
+    Left = 1288
+    Top = 276
+    Datasets = <
+      item
+        DataSet = DS_PenjualanRincian4
+        DataSetName = 'DS_PenjualanRincian4'
+      end
+      item
+        DataSet = DSPerusahaan
+        DataSetName = 'DSPerusahaan'
+      end>
+    Variables = <>
+    Style = <>
+    object Data: TfrxDataPage
+      Height = 1000.000000000000000000
+      Width = 1000.000000000000000000
+    end
+    object Page1: TfrxReportPage
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -11
+      Font.Name = 'Century Gothic'
+      Font.Style = []
+      PaperWidth = 210.000000000000000000
+      PaperHeight = 297.000000000000000000
+      PaperSize = 9
+      LeftMargin = 5.000000000000000000
+      RightMargin = 5.000000000000000000
+      TopMargin = 5.000000000000000000
+      BottomMargin = 5.000000000000000000
+      object ReportTitle1: TfrxReportTitle
+        FillType = ftBrush
+        Height = 102.047292910000000000
+        Top = 18.897650000000000000
+        Width = 755.906000000000000000
+        object Memo1: TfrxMemoView
+          Align = baWidth
+          Top = 18.897650000000000000
+          Width = 755.906000000000000000
+          Height = 26.456692910000000000
+          AutoWidth = True
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -16
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          HAlign = haCenter
+          Memo.UTF8 = (
+            '[DSPerusahaan."nama"]')
+          ParentFont = False
+          VAlign = vaCenter
+        end
+        object Memo4: TfrxMemoView
+          Align = baWidth
+          Top = 45.354360000000000000
+          Width = 755.906000000000000000
+          Height = 26.456692910000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clNavy
+          Font.Height = -21
+          Font.Name = 'Century Gothic'
+          Font.Style = [fsBold]
+          Frame.Width = 2.000000000000000000
+          HAlign = haCenter
+          Memo.UTF8 = (
+            'Lap. Penjualan By Product Reguler')
+          ParentFont = False
+          VAlign = vaCenter
+        end
+        object SysMemo2: TfrxSysMemoView
+          Width = 94.488250000000000000
+          Height = 18.897637795275600000
+          AutoWidth = True
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Memo.UTF8 = (
+            '[DATE], [TIME]')
+          ParentFont = False
+        end
+        object txtperiode: TfrxMemoView
+          Align = baWidth
+          Top = 71.811070000000000000
+          Width = 755.906000000000000000
+          Height = 18.897637800000000000
+          AutoWidth = True
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clMaroon
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          HAlign = haCenter
+          ParentFont = False
+          VAlign = vaCenter
+        end
+      end
+      object MasterData1: TfrxMasterData
+        FillType = ftBrush
+        Height = 22.677177560000000000
+        Top = 226.771800000000000000
+        Width = 755.906000000000000000
+        DataSet = DS_PenjualanRincian4
+        DataSetName = 'DS_PenjualanRincian4'
+        RowCount = 0
+        Stretched = True
+        object Memo11: TfrxMemoView
+          Left = 113.385900000000000000
+          Width = 226.771800000000000000
+          Height = 18.897637800000000000
+          StretchMode = smActualHeight
+          DataField = 'namabarang'
+          DataSet = DS_PenjualanRincian4
+          DataSetName = 'DS_PenjualanRincian4'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Width = 2.000000000000000000
+          Memo.UTF8 = (
+            '[DS_PenjualanRincian4."namabarang"]')
+          ParentFont = False
+          Formats = <
+            item
+            end
+            item
+            end>
+        end
+        object Memo12: TfrxMemoView
+          Left = 340.157700000000000000
+          Width = 75.590600000000000000
+          Height = 18.897637800000000000
+          StretchMode = smActualHeight
+          DataField = 'stok'
+          DataSet = DS_PenjualanRincian4
+          DataSetName = 'DS_PenjualanRincian4'
+          DisplayFormat.FormatStr = '#,#0.##'
+          DisplayFormat.Kind = fkNumeric
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Width = 2.000000000000000000
+          HAlign = haRight
+          Memo.UTF8 = (
+            '[DS_PenjualanRincian4."stok"]')
+          ParentFont = False
+        end
+        object Memo8: TfrxMemoView
+          Left = 642.520100000000000000
+          Width = 109.606370000000000000
+          Height = 18.897637800000000000
+          StretchMode = smActualHeight
+          DataSet = DS_PenjualanRincian4
+          DataSetName = 'DS_PenjualanRincian4'
+          DisplayFormat.FormatStr = '#,#0.##'
+          DisplayFormat.Kind = fkNumeric
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Width = 2.000000000000000000
+          HAlign = haRight
+          Memo.UTF8 = (
+            
+              '[<DS_PenjualanRincian4."dppbarang">+<DS_PenjualanRincian4."ppnba' +
+              'rang">]')
+          ParentFont = False
+        end
+        object Memo23: TfrxMemoView
+          Left = 415.748300000000000000
+          Width = 113.385900000000000000
+          Height = 18.897637800000000000
+          StretchMode = smActualHeight
+          DataSet = DS_PenjualanRincian4
+          DataSetName = 'DS_PenjualanRincian4'
+          DisplayFormat.FormatStr = '#,#0.##'
+          DisplayFormat.Kind = fkNumeric
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Width = 2.000000000000000000
+          HAlign = haRight
+          Memo.UTF8 = (
+            '[DS_PenjualanRincian4."dppbarang"]')
+          ParentFont = False
+        end
+        object Memo24: TfrxMemoView
+          Left = 529.134200000000000000
+          Width = 113.385900000000000000
+          Height = 18.897637800000000000
+          StretchMode = smActualHeight
+          DataSet = DS_PenjualanRincian4
+          DataSetName = 'DS_PenjualanRincian4'
+          DisplayFormat.FormatStr = '#,#0.##'
+          DisplayFormat.Kind = fkNumeric
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Width = 2.000000000000000000
+          HAlign = haRight
+          Memo.UTF8 = (
+            '[DS_PenjualanRincian4."ppnbarang"]')
+          ParentFont = False
+        end
+        object Memo45: TfrxMemoView
+          Width = 113.385900000000000000
+          Height = 18.897637800000000000
+          StretchMode = smActualHeight
+          DataSet = DS_PenjualanRincian4
+          DataSetName = 'DS_PenjualanRincian4'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Width = 2.000000000000000000
+          Memo.UTF8 = (
+            '[DS_PenjualanRincian4."kodebarang"]')
+          ParentFont = False
+        end
+      end
+      object PageFooter1: TfrxPageFooter
+        FillType = ftBrush
+        Height = 26.456710000000000000
+        Top = 521.575140000000000000
+        Width = 755.906000000000000000
+        object Memo52: TfrxMemoView
+          Align = baWidth
+          Top = 3.779529999999999000
+          Width = 755.906000000000000000
+          Height = 3.779527559055120000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -13
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Typ = [ftTop]
+          Frame.Width = 2.000000000000000000
+          ParentFont = False
+          VAlign = vaCenter
+        end
+        object SysMemo1: TfrxSysMemoView
+          Top = 7.559059999999999000
+          Width = 151.181200000000000000
+          Height = 18.897637795275600000
+          AutoWidth = True
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Memo.UTF8 = (
+            'Halaman : [PAGE#]')
+          ParentFont = False
+        end
+      end
+      object ReportSummary1: TfrxReportSummary
+        FillType = ftBrush
+        Height = 188.976500000000000000
+        Top = 309.921460000000000000
+        Width = 755.906000000000000000
         object Memo30: TfrxMemoView
-          Left = 929.764380000000000000
-          Top = 37.795300000000000000
+          Left = 374.173470000000000000
+          Top = 45.354360000000000000
           Width = 102.047310000000000000
           Height = 18.897650000000000000
           Memo.UTF8 = (
             'Dibuat Oleh,')
         end
         object Memo31: TfrxMemoView
-          Left = 1065.827460000000000000
-          Top = 37.795300000000000000
+          Left = 510.236550000000000000
+          Top = 45.354360000000000000
           Width = 102.047310000000000000
           Height = 18.897650000000000000
           Memo.UTF8 = (
             'Diketahui Oleh,')
         end
         object Memo32: TfrxMemoView
-          Left = 1205.670070000000000000
-          Top = 37.795300000000000000
+          Left = 650.079160000000000000
+          Top = 45.354360000000000000
           Width = 102.047310000000000000
           Height = 18.897650000000000000
           Memo.UTF8 = (
             'Disetujui Oleh,')
         end
         object Memo33: TfrxMemoView
-          Left = 929.764380000000000000
-          Top = 132.283550000000000000
+          Left = 374.173470000000000000
+          Top = 139.842610000000000000
           Width = 102.047310000000000000
           Height = 18.897650000000000000
           Font.Charset = DEFAULT_CHARSET
@@ -70233,8 +70522,8 @@ object DM: TDM
           ParentFont = False
         end
         object Memo34: TfrxMemoView
-          Left = 1065.827460000000000000
-          Top = 132.283550000000000000
+          Left = 510.236550000000000000
+          Top = 139.842610000000000000
           Width = 102.047310000000000000
           Height = 18.897650000000000000
           Font.Charset = DEFAULT_CHARSET
@@ -70248,8 +70537,8 @@ object DM: TDM
           ParentFont = False
         end
         object Memo35: TfrxMemoView
-          Left = 1205.670070000000000000
-          Top = 132.283550000000000000
+          Left = 650.079160000000000000
+          Top = 139.842610000000000000
           Width = 102.047310000000000000
           Height = 18.897650000000000000
           Font.Charset = DEFAULT_CHARSET
@@ -70262,13 +70551,105 @@ object DM: TDM
             'Tanggal:')
           ParentFont = False
         end
+        object Memo36: TfrxMemoView
+          Left = 574.488560000000000000
+          Top = 7.559060000000000000
+          Width = 64.251887950000000000
+          Height = 18.897637800000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = [fsBold]
+          Frame.Style = fsDouble
+          Memo.UTF8 = (
+            'Total  :')
+          ParentFont = False
+        end
+        object Memo37: TfrxMemoView
+          Left = 638.740570000000000000
+          Top = 7.559060000000000000
+          Width = 113.385900000000000000
+          Height = 18.897637800000000000
+          StretchMode = smActualHeight
+          DataSetName = 'DSPembelianBarangSupplierFaktur'
+          DisplayFormat.FormatStr = '#,#0.##'
+          DisplayFormat.Kind = fkNumeric
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = [fsBold]
+          Frame.Width = 2.000000000000000000
+          HAlign = haRight
+          Memo.UTF8 = (
+            
+              '[<SUM(<DS_PenjualanRincian4."dppbarang">,MasterData1)>+<SUM(<DS_' +
+              'PenjualanRincian4."ppnbarang">,MasterData1)>]')
+          ParentFont = False
+        end
+        object Memo41: TfrxMemoView
+          Align = baWidth
+          Top = 26.456710000000000000
+          Width = 755.906000000000000000
+          Height = 3.779527560000000000
+          StretchMode = smActualHeight
+          DisplayFormat.FormatStr = '#,#0.##'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -13
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Color = clMaroon
+          Frame.Typ = [ftBottom]
+          Frame.Width = 2.000000000000000000
+          ParentFont = False
+          VAlign = vaCenter
+        end
+        object Memo42: TfrxMemoView
+          Align = baWidth
+          Top = 3.779530000000000000
+          Width = 755.906000000000000000
+          Height = 3.779527560000000000
+          StretchMode = smActualHeight
+          DisplayFormat.FormatStr = '#,#0.##'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -13
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Color = clMaroon
+          Frame.Typ = [ftTop]
+          Frame.Width = 2.000000000000000000
+          ParentFont = False
+          VAlign = vaCenter
+        end
       end
       object PageHeader1: TfrxPageHeader
         FillType = ftBrush
         Height = 22.677180000000000000
-        Top = 154.960730000000000000
-        Width = 1307.717380000000000000
+        Top = 143.622140000000000000
+        Width = 755.906000000000000000
         object Memo5: TfrxMemoView
+          Left = 113.385900000000000000
+          Top = 3.779530000000000000
+          Width = 226.771677950000000000
+          Height = 18.897637800000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clNavy
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Color = clMaroon
+          Frame.Style = fsDouble
+          Frame.Typ = [ftTop, ftBottom]
+          HAlign = haCenter
+          Memo.UTF8 = (
+            'Nama')
+          ParentFont = False
+        end
+        object Memo26: TfrxMemoView
+          Left = 340.157700000000000000
           Top = 3.779530000000000000
           Width = 75.590477950000000000
           Height = 18.897637800000000000
@@ -70282,103 +70663,13 @@ object DM: TDM
           Frame.Typ = [ftTop, ftBottom]
           HAlign = haCenter
           Memo.UTF8 = (
-            'Tanggal')
-          ParentFont = False
-        end
-        object Memo26: TfrxMemoView
-          Left = 75.590600000000000000
-          Top = 3.779530000000000000
-          Width = 94.488188976377950000
-          Height = 18.897637800000000000
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clNavy
-          Font.Height = -11
-          Font.Name = 'Century Gothic'
-          Font.Style = []
-          Frame.Color = clMaroon
-          Frame.Style = fsDouble
-          Frame.Typ = [ftTop, ftBottom]
-          HAlign = haCenter
-          Memo.UTF8 = (
-            'No. SO')
-          ParentFont = False
-        end
-        object Memo3: TfrxMemoView
-          Left = 548.031850000000000000
-          Top = 3.779530000000000000
-          Width = 476.220657950000000000
-          Height = 18.897637800000000000
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clNavy
-          Font.Height = -11
-          Font.Name = 'Century Gothic'
-          Font.Style = []
-          Frame.Color = clMaroon
-          Frame.Style = fsDouble
-          Frame.Typ = [ftTop, ftBottom]
-          HAlign = haCenter
-          Memo.UTF8 = (
-            'Customer')
-          ParentFont = False
-        end
-        object Memo14: TfrxMemoView
-          Left = 1024.252630000000000000
-          Top = 3.779530000000000000
-          Width = 94.488188980000000000
-          Height = 18.897637800000000000
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clNavy
-          Font.Height = -11
-          Font.Name = 'Century Gothic'
-          Font.Style = []
-          Frame.Color = clMaroon
-          Frame.Style = fsDouble
-          Frame.Typ = [ftTop, ftBottom]
-          HAlign = haCenter
-          Memo.UTF8 = (
-            'Total Penjualan')
-          ParentFont = False
-        end
-        object Memo8: TfrxMemoView
-          Left = 170.078850000000000000
-          Top = 3.779530000000000000
-          Width = 94.488188980000000000
-          Height = 18.897637800000000000
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clNavy
-          Font.Height = -11
-          Font.Name = 'Century Gothic'
-          Font.Style = []
-          Frame.Color = clMaroon
-          Frame.Style = fsDouble
-          Frame.Typ = [ftTop, ftBottom]
-          HAlign = haCenter
-          Memo.UTF8 = (
-            'No. DO')
-          ParentFont = False
-        end
-        object Memo12: TfrxMemoView
-          Left = 264.567100000000000000
-          Top = 3.779530000000000000
-          Width = 94.488188980000000000
-          Height = 18.897637800000000000
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clNavy
-          Font.Height = -11
-          Font.Name = 'Century Gothic'
-          Font.Style = []
-          Frame.Color = clMaroon
-          Frame.Style = fsDouble
-          Frame.Typ = [ftTop, ftBottom]
-          HAlign = haCenter
-          Memo.UTF8 = (
-            'No. SJ')
+            'Qty. Terjual')
           ParentFont = False
         end
         object Memo9: TfrxMemoView
-          Left = 359.055350000000000000
+          Left = 415.748300000000000000
           Top = 3.779530000000000000
-          Width = 94.488188980000000000
+          Width = 113.385777950000000000
           Height = 18.897637800000000000
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clNavy
@@ -70390,31 +70681,13 @@ object DM: TDM
           Frame.Typ = [ftTop, ftBottom]
           HAlign = haCenter
           Memo.UTF8 = (
-            'No.Faktur ')
-          ParentFont = False
-        end
-        object Memo6: TfrxMemoView
-          Left = 1118.740880000000000000
-          Top = 3.779530000000000000
-          Width = 94.488188980000000000
-          Height = 18.897637800000000000
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clNavy
-          Font.Height = -11
-          Font.Name = 'Century Gothic'
-          Font.Style = []
-          Frame.Color = clMaroon
-          Frame.Style = fsDouble
-          Frame.Typ = [ftTop, ftBottom]
-          HAlign = haCenter
-          Memo.UTF8 = (
-            'Total Retur')
+            'DPP')
           ParentFont = False
         end
         object Memo15: TfrxMemoView
-          Left = 1213.229130000000000000
+          Left = 642.520100000000000000
           Top = 3.779530000000000000
-          Width = 94.488188980000000000
+          Width = 113.385777950000000000
           Height = 18.897637800000000000
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clNavy
@@ -70429,10 +70702,10 @@ object DM: TDM
             'Total')
           ParentFont = False
         end
-        object Memo16: TfrxMemoView
-          Left = 453.543600000000000000
+        object Memo21: TfrxMemoView
+          Left = 529.134200000000000000
           Top = 3.779530000000000000
-          Width = 94.488188980000000000
+          Width = 113.385777950000000000
           Height = 18.897637800000000000
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clNavy
@@ -70444,10 +70717,1813 @@ object DM: TDM
           Frame.Typ = [ftTop, ftBottom]
           HAlign = haCenter
           Memo.UTF8 = (
-            'No. Retur')
+            'PPN')
+          ParentFont = False
+        end
+        object Memo44: TfrxMemoView
+          Top = 3.779530000000000000
+          Width = 113.385777950000000000
+          Height = 18.897637800000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clNavy
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Color = clMaroon
+          Frame.Style = fsDouble
+          Frame.Typ = [ftTop, ftBottom]
+          HAlign = haCenter
+          Memo.UTF8 = (
+            'Kode Barang')
           ParentFont = False
         end
       end
     end
+  end
+  object DS_PenjualanRincian4: TfrxDBDataset
+    UserName = 'DS_PenjualanRincian4'
+    CloseDataSource = False
+    DataSet = Q_PenjualanRincian4
+    BCDToCurrency = False
+    Left = 1320
+    Top = 276
+  end
+  object Q_PenjualanRincian4: TZQuery
+    Connection = con
+    SQL.Strings = (
+      'SELECT a.*,b.kodebarang,b.namabarang FROM'
+      
+        '(SELECT b.nobarang,IFNULL(SUM(b.qty*b.nilai),0) AS stok,SUM(b.dp' +
+        'pbarang)AS dppbarang,SUM(b.ppnbarang)AS ppnbarang FROM'
+      '(SELECT b.nobarang,b.qty,b.nilai,b.dppbarang,b.ppnbarang FROM'
+      
+        '(SELECT nopenjualaninvoice AS noref FROM tbl_penjualaninvoice WH' +
+        'ERE tglpenjualaninvoice BETWEEN :tkd AND :tks)AS a'
+      
+        'LEFT JOIN tbl_penjualaninvoicedetail AS b ON b.nopenjualaninvoic' +
+        'e=a.noref having b.dppbarang>0'
+      'UNION ALL'
+      'SELECT b.nobarang,b.qty,b.nilai,b.dppbarang,b.ppnbarang FROM'
+      
+        '(SELECT nopenjualantunai AS noref FROM tbl_penjualantunai WHERE ' +
+        'tgltransaksi BETWEEN :tkd AND :tks)AS a'
+      
+        'LEFT JOIN tbl_penjualantunaidetail AS b ON b.nopenjualantunai=a.' +
+        'noref having b.dppbarang>0)AS b GROUP BY b.nobarang)AS a'
+      
+        'LEFT JOIN tbl_barang AS b ON b.nobarang=a.nobarang ORDER BY b.na' +
+        'mabarang')
+    Params = <
+      item
+        DataType = ftUnknown
+        Name = 'tkd'
+        ParamType = ptUnknown
+      end
+      item
+        DataType = ftUnknown
+        Name = 'tks'
+        ParamType = ptUnknown
+      end>
+    Left = 1352
+    Top = 276
+    ParamData = <
+      item
+        DataType = ftUnknown
+        Name = 'tkd'
+        ParamType = ptUnknown
+      end
+      item
+        DataType = ftUnknown
+        Name = 'tks'
+        ParamType = ptUnknown
+      end>
+  end
+  object Rpt_KartuStokBarang: TfrxReport
+    Version = '5.2.3'
+    DotMatrixReport = False
+    IniFile = '\Software\Fast Reports'
+    PreviewOptions.Buttons = [pbPrint, pbLoad, pbSave, pbExport, pbZoom, pbFind, pbOutline, pbPageSetup, pbTools, pbEdit, pbNavigator, pbExportQuick]
+    PreviewOptions.Zoom = 1.000000000000000000
+    PrintOptions.Printer = 'Default'
+    PrintOptions.PrintOnSheet = 0
+    ReportOptions.CreateDate = 41624.593323761600000000
+    ReportOptions.LastChange = 41624.593323761600000000
+    ScriptLanguage = 'PascalScript'
+    ScriptText.Strings = (
+      'begin'
+      '                                                   '
+      'end.    ')
+    Left = 664
+    Top = 423
+    Datasets = <
+      item
+        DataSet = DS_KartuStokBarang
+        DataSetName = 'DS_KartuStokBarang'
+      end
+      item
+        DataSet = frxDBDataset2
+        DataSetName = 'DS_KartuStokBarangAwal'
+      end
+      item
+        DataSet = DSPerusahaan
+        DataSetName = 'DSPerusahaan'
+      end>
+    Variables = <>
+    Style = <>
+    object Data: TfrxDataPage
+      Height = 1000.000000000000000000
+      Width = 1000.000000000000000000
+    end
+    object Page1: TfrxReportPage
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -11
+      Font.Name = 'Century Gothic'
+      Font.Style = []
+      PaperWidth = 210.000000000000000000
+      PaperHeight = 297.000000000000000000
+      PaperSize = 256
+      LeftMargin = 5.000000000000000000
+      RightMargin = 5.000000000000000000
+      TopMargin = 5.000000000000000000
+      BottomMargin = 5.000000000000000000
+      object ReportTitle1: TfrxReportTitle
+        FillType = ftBrush
+        Height = 113.385882910000000000
+        Top = 18.897650000000000000
+        Width = 755.906000000000000000
+        object Memo1: TfrxMemoView
+          Align = baWidth
+          Top = 18.897650000000000000
+          Width = 755.906000000000000000
+          Height = 26.456692910000000000
+          AutoWidth = True
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -16
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          HAlign = haCenter
+          Memo.UTF8 = (
+            '[DSPerusahaan."nama"]')
+          ParentFont = False
+          VAlign = vaCenter
+        end
+        object Memo4: TfrxMemoView
+          Align = baWidth
+          Top = 45.354360000000000000
+          Width = 755.906000000000000000
+          Height = 26.456692910000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clNavy
+          Font.Height = -21
+          Font.Name = 'Century Gothic'
+          Font.Style = [fsBold]
+          Frame.Width = 2.000000000000000000
+          HAlign = haCenter
+          Memo.UTF8 = (
+            'Lap. Stok - Rangkuman')
+          ParentFont = False
+          VAlign = vaCenter
+        end
+        object SysMemo2: TfrxSysMemoView
+          Width = 94.488250000000000000
+          Height = 18.897637795275600000
+          AutoWidth = True
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Memo.UTF8 = (
+            '[DATE], [TIME]')
+          ParentFont = False
+        end
+        object txtperiode: TfrxMemoView
+          Align = baWidth
+          Top = 71.811070000000000000
+          Width = 755.906000000000000000
+          Height = 18.897637800000000000
+          AutoWidth = True
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clMaroon
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          HAlign = haCenter
+          ParentFont = False
+          VAlign = vaCenter
+        end
+      end
+      object MasterData1: TfrxMasterData
+        FillType = ftBrush
+        Height = 18.897637800000000000
+        Top = 264.567100000000000000
+        Width = 755.906000000000000000
+        OnBeforePrint = 'MasterData1OnBeforePrint'
+        DataSet = DS_KartuStokBarang
+        DataSetName = 'DS_KartuStokBarang'
+        RowCount = 0
+        Stretched = True
+        object Memo2: TfrxMemoView
+          Width = 75.590477950000000000
+          Height = 18.897637800000000000
+          StretchMode = smMaxHeight
+          DataField = 'kodebarang'
+          DataSet = DS_KartuStokBarang
+          DataSetName = 'DS_KartuStokBarang'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          HideZeros = True
+          Memo.UTF8 = (
+            '[DS_KartuStokBarang."kodebarang"]')
+          ParentFont = False
+        end
+        object Memo29: TfrxMemoView
+          Left = 544.252320000000000000
+          Width = 75.590543860000000000
+          Height = 18.897637800000000000
+          StretchMode = smMaxHeight
+          DataField = 'penjualantester'
+          DataSet = DS_KartuStokBarang
+          DataSetName = 'DS_KartuStokBarang'
+          DisplayFormat.FormatStr = '#,#0.##'
+          DisplayFormat.Kind = fkNumeric
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Typ = [ftLeft]
+          HAlign = haRight
+          Memo.UTF8 = (
+            '[DS_KartuStokBarang."penjualantester"]')
+          ParentFont = False
+          VAlign = vaCenter
+        end
+        object Memo32: TfrxMemoView
+          Left = 468.661720000000000000
+          Width = 75.590543860000000000
+          Height = 18.897637800000000000
+          StretchMode = smMaxHeight
+          DataField = 'penjualan'
+          DataSet = DS_KartuStokBarang
+          DataSetName = 'DS_KartuStokBarang'
+          DisplayFormat.FormatStr = '#,#0.##'
+          DisplayFormat.Kind = fkNumeric
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Typ = [ftLeft]
+          HAlign = haRight
+          Memo.UTF8 = (
+            '[DS_KartuStokBarang."penjualan"]')
+          ParentFont = False
+          VAlign = vaCenter
+        end
+        object Memo7: TfrxMemoView
+          Left = 75.590600000000000000
+          Width = 185.196847950000000000
+          Height = 18.897637800000000000
+          StretchMode = smMaxHeight
+          DataField = 'namabarang'
+          DataSet = DS_KartuStokBarang
+          DataSetName = 'DS_KartuStokBarang'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Typ = [ftLeft]
+          HideZeros = True
+          Memo.UTF8 = (
+            '[DS_KartuStokBarang."namabarang"]')
+          ParentFont = False
+        end
+        object Memo25: TfrxMemoView
+          Left = 393.071120000000000000
+          Width = 75.590543860000000000
+          Height = 18.897637800000000000
+          StretchMode = smMaxHeight
+          DataField = 'returjual'
+          DataSet = DS_KartuStokBarang
+          DataSetName = 'DS_KartuStokBarang'
+          DisplayFormat.FormatStr = '#,#0.##'
+          DisplayFormat.Kind = fkNumeric
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Typ = [ftLeft]
+          HAlign = haRight
+          Memo.UTF8 = (
+            '[DS_KartuStokBarang."returjual"]')
+          ParentFont = False
+          VAlign = vaCenter
+        end
+        object Memo13: TfrxMemoView
+          Left = 317.480520000000000000
+          Width = 75.590543860000000000
+          Height = 18.897637800000000000
+          StretchMode = smMaxHeight
+          DataField = 'pembelian'
+          DataSet = DS_KartuStokBarang
+          DataSetName = 'DS_KartuStokBarang'
+          DisplayFormat.FormatStr = '#,#0.##'
+          DisplayFormat.Kind = fkNumeric
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Typ = [ftLeft]
+          HAlign = haRight
+          Memo.UTF8 = (
+            '[DS_KartuStokBarang."pembelian"]')
+          ParentFont = False
+          VAlign = vaCenter
+        end
+        object Memo17: TfrxMemoView
+          Left = 619.842920000000000000
+          Width = 75.590543860000000000
+          Height = 18.897637800000000000
+          StretchMode = smMaxHeight
+          DataField = 'returbeli'
+          DataSet = DS_KartuStokBarang
+          DataSetName = 'DS_KartuStokBarang'
+          DisplayFormat.FormatStr = '#,#0.##'
+          DisplayFormat.Kind = fkNumeric
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Typ = [ftLeft]
+          HAlign = haRight
+          Memo.UTF8 = (
+            '[DS_KartuStokBarang."returbeli"]')
+          ParentFont = False
+          VAlign = vaCenter
+        end
+        object Memo22: TfrxMemoView
+          Left = 695.433520000000000000
+          Width = 60.472423860000000000
+          Height = 18.897637800000000000
+          StretchMode = smMaxHeight
+          DataSet = DS_KartuStokBarang
+          DataSetName = 'DS_KartuStokBarang'
+          DisplayFormat.FormatStr = '#,#0.##'
+          DisplayFormat.Kind = fkNumeric
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Typ = [ftLeft]
+          HAlign = haRight
+          Memo.UTF8 = (
+            
+              '[<DS_KartuStokBarangAwal."saldo">+<DS_KartuStokBarang."pembelian' +
+              '">+<DS_KartuStokBarang."returjual">-<DS_KartuStokBarang."penjual' +
+              'an">-<DS_KartuStokBarang."penjualantester">-<DS_KartuStokBarang.' +
+              '"returbeli">]')
+          ParentFont = False
+          VAlign = vaCenter
+        end
+        object Memo26: TfrxMemoView
+          Left = 260.787570000000000000
+          Width = 56.692893860000000000
+          Height = 18.897637800000000000
+          StretchMode = smMaxHeight
+          DataSet = DS_KartuStokBarang
+          DataSetName = 'DS_KartuStokBarang'
+          DisplayFormat.FormatStr = '#,#0.##'
+          DisplayFormat.Kind = fkNumeric
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Typ = [ftLeft]
+          HAlign = haRight
+          Memo.UTF8 = (
+            '[DS_KartuStokBarangAwal."saldo"]')
+          ParentFont = False
+          VAlign = vaCenter
+        end
+      end
+      object PageFooter1: TfrxPageFooter
+        FillType = ftBrush
+        Height = 26.456710000000000000
+        Top = 374.173470000000000000
+        Width = 755.906000000000000000
+        OnBeforePrint = 'PageFooter1OnBeforePrint'
+        object Memo52: TfrxMemoView
+          Align = baWidth
+          Top = 3.779530000000000000
+          Width = 755.906000000000000000
+          Height = 3.779527560000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -13
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Typ = [ftTop]
+          Frame.Width = 2.000000000000000000
+          ParentFont = False
+          VAlign = vaCenter
+        end
+        object SysMemo1: TfrxSysMemoView
+          Top = 7.559060000000000000
+          Width = 151.181200000000000000
+          Height = 18.897637800000000000
+          AutoWidth = True
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Memo.UTF8 = (
+            'Halaman : [PAGE#]')
+          ParentFont = False
+        end
+      end
+      object PageHeader1: TfrxPageHeader
+        FillType = ftBrush
+        Height = 49.133877800000000000
+        Top = 154.960730000000000000
+        Width = 755.906000000000000000
+        object Memo5: TfrxMemoView
+          Top = 3.779530000000000000
+          Width = 75.590477950000000000
+          Height = 45.354347800000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Typ = [ftTop, ftBottom]
+          HAlign = haCenter
+          Memo.UTF8 = (
+            'Kode')
+          ParentFont = False
+          VAlign = vaCenter
+        end
+        object Memo8: TfrxMemoView
+          Align = baWidth
+          Width = 755.906000000000000000
+          Height = 3.779527560000000000
+          StretchMode = smActualHeight
+          DisplayFormat.FormatStr = '#,#0.##'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -13
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Color = clMaroon
+          Frame.Typ = [ftTop]
+          Frame.Width = 2.000000000000000000
+          ParentFont = False
+          VAlign = vaCenter
+        end
+        object Memo14: TfrxMemoView
+          Left = 468.661720000000000000
+          Top = 3.779530000000000000
+          Width = 226.771743860000000000
+          Height = 18.897637800000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Typ = [ftLeft, ftTop, ftBottom]
+          HAlign = haCenter
+          Memo.UTF8 = (
+            'Keluar')
+          ParentFont = False
+          VAlign = vaCenter
+        end
+        object Memo15: TfrxMemoView
+          Left = 544.252320000000000000
+          Top = 22.677180000000000000
+          Width = 75.590551180000000000
+          Height = 26.456697800000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Typ = [ftLeft, ftTop, ftBottom]
+          HAlign = haCenter
+          Memo.UTF8 = (
+            'Penj. Tester')
+          ParentFont = False
+          VAlign = vaCenter
+        end
+        object Memo20: TfrxMemoView
+          Left = 317.480520000000000000
+          Top = 3.779530000000000000
+          Width = 151.181143860000000000
+          Height = 18.897637800000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Typ = [ftLeft, ftTop, ftBottom]
+          HAlign = haCenter
+          Memo.UTF8 = (
+            'Masuk')
+          ParentFont = False
+          VAlign = vaCenter
+        end
+        object Memo6: TfrxMemoView
+          Left = 75.590600000000000000
+          Top = 3.779530000000000000
+          Width = 185.196847950000000000
+          Height = 45.354347800000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Typ = [ftLeft, ftTop, ftBottom]
+          HAlign = haCenter
+          Memo.UTF8 = (
+            'Barang')
+          ParentFont = False
+          VAlign = vaCenter
+        end
+        object Memo3: TfrxMemoView
+          Left = 393.071120000000000000
+          Top = 22.677180000000000000
+          Width = 75.590551180000000000
+          Height = 26.456697800000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Typ = [ftLeft, ftTop, ftBottom]
+          HAlign = haCenter
+          Memo.UTF8 = (
+            'Ret. Penjualan')
+          ParentFont = False
+          VAlign = vaCenter
+        end
+        object Memo9: TfrxMemoView
+          Left = 619.842920000000000000
+          Top = 22.677180000000000000
+          Width = 75.590551180000000000
+          Height = 26.456697800000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Typ = [ftLeft, ftTop, ftBottom]
+          HAlign = haCenter
+          Memo.UTF8 = (
+            'Ret. Pembelian')
+          ParentFont = False
+          VAlign = vaCenter
+        end
+        object Memo10: TfrxMemoView
+          Left = 468.661720000000000000
+          Top = 22.677180000000000000
+          Width = 75.590551180000000000
+          Height = 26.456697800000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Typ = [ftLeft, ftTop, ftBottom]
+          HAlign = haCenter
+          Memo.UTF8 = (
+            'Penjualan')
+          ParentFont = False
+          VAlign = vaCenter
+        end
+        object Memo12: TfrxMemoView
+          Left = 317.480520000000000000
+          Top = 22.677180000000000000
+          Width = 75.590551180000000000
+          Height = 26.456697800000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Typ = [ftLeft, ftTop, ftBottom]
+          HAlign = haCenter
+          Memo.UTF8 = (
+            'Pembelian')
+          ParentFont = False
+          VAlign = vaCenter
+        end
+        object Memo18: TfrxMemoView
+          Left = 695.433520000000000000
+          Top = 3.779530000000000000
+          Width = 60.472423860000000000
+          Height = 45.354347800000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Typ = [ftLeft, ftTop, ftBottom]
+          HAlign = haCenter
+          Memo.UTF8 = (
+            'Saldo')
+          ParentFont = False
+          VAlign = vaCenter
+        end
+        object Memo24: TfrxMemoView
+          Left = 260.787570000000000000
+          Top = 3.779530000000000000
+          Width = 56.692893860000000000
+          Height = 45.354347800000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Typ = [ftLeft, ftTop, ftBottom]
+          HAlign = haCenter
+          Memo.UTF8 = (
+            'Awal')
+          ParentFont = False
+          VAlign = vaCenter
+        end
+      end
+      object ReportSummary1: TfrxReportSummary
+        FillType = ftBrush
+        Height = 7.559060000000000000
+        Top = 343.937230000000000000
+        Width = 755.906000000000000000
+        object Memo16: TfrxMemoView
+          Align = baWidth
+          Width = 755.906000000000000000
+          Height = 3.779527560000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -13
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Typ = [ftTop]
+          ParentFont = False
+          VAlign = vaCenter
+        end
+      end
+    end
+  end
+  object Q_KartuStokBarang: TZQuery
+    Connection = con
+    SQL.Strings = (
+      'SELECT a.*,b.kodesatuan FROM'
+      '(SELECT a.*,IFNULL(SUM(b.keluar-b.masuk),0)AS returbeli FROM'
+      
+        '(SELECT a.*,IFNULL(SUM(b.keluar-b.masuk),0)AS penjualantester FR' +
+        'OM'
+      '(SELECT a.*,IFNULL(SUM(b.keluar-b.masuk),0)AS penjualan FROM'
+      '(SELECT a.*,IFNULL(SUM(b.masuk-b.keluar),0)AS returjual FROM'
+      '(SELECT a.*,IFNULL(SUM(b.masuk-b.keluar),0)AS pembelian FROM'
+      
+        '(SELECT nobarang,kodebarang,namabarang,nosatuan FROM tbl_barang ' +
+        'WHERE tipebarang=0 AND aktif=1)AS a'
+      
+        'LEFT JOIN tbl_bukubesarbarang AS b ON b.nobarang=a.nobarang AND ' +
+        'b.tipe='#39'TO'#39' AND tgltransaksi BETWEEN :tkd AND :tks GROUP BY a.no' +
+        'barang)AS a'
+      
+        'LEFT JOIN tbl_bukubesarbarang AS b ON b.nobarang=a.nobarang AND ' +
+        'b.tipe='#39'SR'#39' AND tgltransaksi BETWEEN :tkd AND :tks GROUP BY a.no' +
+        'barang)AS a'
+      
+        'LEFT JOIN tbl_bukubesarbarang AS b ON b.nobarang=a.nobarang AND ' +
+        'b.tipe='#39'DO'#39' AND b.hargajual>0 AND tgltransaksi BETWEEN :tkd AND ' +
+        ':tks GROUP BY a.nobarang)AS a'
+      
+        'LEFT JOIN tbl_bukubesarbarang AS b ON b.nobarang=a.nobarang AND ' +
+        'b.tipe='#39'DO'#39' AND b.hargajual<=0 AND tgltransaksi BETWEEN :tkd AND' +
+        ' :tks GROUP BY a.nobarang)AS a'
+      
+        'LEFT JOIN tbl_bukubesarbarang AS b ON b.nobarang=a.nobarang AND ' +
+        'b.tipe='#39'PR'#39' AND tgltransaksi BETWEEN :tkd AND :tks GROUP BY a.no' +
+        'barang)AS a'
+      
+        'LEFT JOIN tbl_satuan AS b ON b.nosatuan=a.nosatuan ORDER BY a.na' +
+        'mabarang')
+    Params = <
+      item
+        DataType = ftUnknown
+        Name = 'tkd'
+        ParamType = ptUnknown
+      end
+      item
+        DataType = ftUnknown
+        Name = 'tks'
+        ParamType = ptUnknown
+      end>
+    Left = 600
+    Top = 418
+    ParamData = <
+      item
+        DataType = ftUnknown
+        Name = 'tkd'
+        ParamType = ptUnknown
+      end
+      item
+        DataType = ftUnknown
+        Name = 'tks'
+        ParamType = ptUnknown
+      end>
+  end
+  object DS_KartuStokBarang: TfrxDBDataset
+    UserName = 'DS_KartuStokBarang'
+    CloseDataSource = False
+    DataSet = Q_KartuStokBarang
+    BCDToCurrency = False
+    Left = 632
+    Top = 421
+  end
+  object Rpt_KasKeluar: TfrxReport
+    Version = '5.2.3'
+    DotMatrixReport = False
+    IniFile = '\Software\Fast Reports'
+    PreviewOptions.Buttons = [pbPrint, pbLoad, pbSave, pbExport, pbZoom, pbFind, pbOutline, pbPageSetup, pbTools, pbEdit, pbNavigator, pbExportQuick]
+    PreviewOptions.Zoom = 1.000000000000000000
+    PrintOptions.Printer = 'Default'
+    PrintOptions.PrintOnSheet = 0
+    ReportOptions.CreateDate = 41624.593323761600000000
+    ReportOptions.LastChange = 41624.593323761600000000
+    ScriptLanguage = 'PascalScript'
+    ScriptText.Strings = (
+      'begin'
+      ''
+      'end.')
+    Left = 152
+    Top = 280
+    Datasets = <
+      item
+        DataSet = DS_KasKeluar
+        DataSetName = 'DS_KasKeluar'
+      end
+      item
+        DataSet = DSPerusahaan
+        DataSetName = 'DSPerusahaan'
+      end>
+    Variables = <>
+    Style = <>
+    object Data: TfrxDataPage
+      Height = 1000.000000000000000000
+      Width = 1000.000000000000000000
+    end
+    object Page1: TfrxReportPage
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -11
+      Font.Name = 'Century Gothic'
+      Font.Style = []
+      PaperWidth = 210.000000000000000000
+      PaperHeight = 297.000000000000000000
+      PaperSize = 9
+      LeftMargin = 5.000000000000000000
+      RightMargin = 5.000000000000000000
+      TopMargin = 5.000000000000000000
+      BottomMargin = 5.000000000000000000
+      object ReportTitle1: TfrxReportTitle
+        FillType = ftBrush
+        Height = 113.385882910000000000
+        Top = 18.897650000000000000
+        Width = 755.906000000000000000
+        object Memo1: TfrxMemoView
+          Align = baWidth
+          Top = 18.897650000000000000
+          Width = 755.906000000000000000
+          Height = 26.456692910000000000
+          AutoWidth = True
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -16
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          HAlign = haCenter
+          Memo.UTF8 = (
+            '[DSPerusahaan."nama"]')
+          ParentFont = False
+          VAlign = vaCenter
+        end
+        object Memo4: TfrxMemoView
+          Align = baWidth
+          Top = 45.354360000000000000
+          Width = 755.906000000000000000
+          Height = 26.456692910000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clNavy
+          Font.Height = -21
+          Font.Name = 'Century Gothic'
+          Font.Style = [fsBold]
+          Frame.Width = 2.000000000000000000
+          HAlign = haCenter
+          Memo.UTF8 = (
+            'Pengeluaran Lain')
+          ParentFont = False
+          VAlign = vaCenter
+        end
+        object SysMemo2: TfrxSysMemoView
+          Width = 94.488250000000000000
+          Height = 18.897637795275600000
+          AutoWidth = True
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Memo.UTF8 = (
+            '[DATE], [TIME]')
+          ParentFont = False
+        end
+        object txtperiode: TfrxMemoView
+          Align = baWidth
+          Top = 71.811070000000000000
+          Width = 755.906000000000000000
+          Height = 18.897637795275600000
+          AutoWidth = True
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clMaroon
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          HAlign = haCenter
+          ParentFont = False
+          VAlign = vaCenter
+        end
+      end
+      object MasterData1: TfrxMasterData
+        FillType = ftBrush
+        Height = 18.897647560000000000
+        Top = 283.464750000000000000
+        Width = 755.906000000000000000
+        DataSet = DS_KasKeluar
+        DataSetName = 'DS_KasKeluar'
+        RowCount = 0
+        Stretched = True
+        object Memo11: TfrxMemoView
+          Left = 94.488250000000000000
+          Width = 245.669450000000000000
+          Height = 18.897637800000000000
+          StretchMode = smActualHeight
+          DataField = 'namaakun'
+          DataSet = DS_KasKeluar
+          DataSetName = 'DS_KasKeluar'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Width = 2.000000000000000000
+          Memo.UTF8 = (
+            '[DS_KasKeluar."namaakun"]')
+          ParentFont = False
+        end
+        object Memo2: TfrxMemoView
+          Left = 453.543600000000000000
+          Width = 302.362400000000000000
+          Height = 18.897637800000000000
+          StretchMode = smActualHeight
+          DataField = 'memo'
+          DataSet = DS_KasKeluar
+          DataSetName = 'DS_KasKeluar'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Typ = [ftLeft]
+          Memo.UTF8 = (
+            '[DS_KasKeluar."memo"]')
+          ParentFont = False
+        end
+        object Memo7: TfrxMemoView
+          Left = 340.157700000000000000
+          Width = 113.385900000000000000
+          Height = 18.897637800000000000
+          StretchMode = smActualHeight
+          DataField = 'jumlah'
+          DataSet = DS_KasKeluar
+          DataSetName = 'DS_KasKeluar'
+          DisplayFormat.FormatStr = '#,#0.##'
+          DisplayFormat.Kind = fkNumeric
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Width = 2.000000000000000000
+          HAlign = haRight
+          Memo.UTF8 = (
+            '[DS_KasKeluar."jumlah"]')
+          ParentFont = False
+        end
+        object Memo10: TfrxMemoView
+          Width = 94.488250000000000000
+          Height = 18.897637800000000000
+          StretchMode = smActualHeight
+          DataField = 'kodeakun'
+          DataSet = DS_KasKeluar
+          DataSetName = 'DS_KasKeluar'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Width = 2.000000000000000000
+          Memo.UTF8 = (
+            '[DS_KasKeluar."kodeakun"]')
+          ParentFont = False
+        end
+      end
+      object PageFooter1: TfrxPageFooter
+        FillType = ftBrush
+        Height = 26.456710000000000000
+        Top = 419.527830000000000000
+        Width = 755.906000000000000000
+        object Memo52: TfrxMemoView
+          Align = baWidth
+          Top = 3.779530000000000000
+          Width = 755.906000000000000000
+          Height = 3.779527559055120000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -13
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Typ = [ftTop]
+          Frame.Width = 2.000000000000000000
+          ParentFont = False
+          VAlign = vaCenter
+        end
+        object SysMemo1: TfrxSysMemoView
+          Top = 7.559060000000000000
+          Width = 151.181200000000000000
+          Height = 18.897637795275600000
+          AutoWidth = True
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Memo.UTF8 = (
+            'Halaman : [PAGE#]')
+          ParentFont = False
+        end
+      end
+      object GroupHeader2: TfrxGroupHeader
+        FillType = ftBrush
+        Height = 68.031527800000000000
+        Top = 192.756030000000000000
+        Width = 755.906000000000000000
+        Condition = 'DS_KasKeluar."nopengeluaran"'
+        object Memo14: TfrxMemoView
+          Left = 94.488250000000000000
+          Top = 49.133890000000000000
+          Width = 245.669327950000000000
+          Height = 18.897637800000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clNavy
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Color = clMaroon
+          Frame.Style = fsDouble
+          Frame.Typ = [ftTop, ftBottom]
+          HAlign = haCenter
+          Memo.UTF8 = (
+            'Nama')
+          ParentFont = False
+        end
+        object Memo26: TfrxMemoView
+          Left = 340.157700000000000000
+          Top = 49.133890000000000000
+          Width = 113.385777950000000000
+          Height = 18.897637800000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clNavy
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Color = clMaroon
+          Frame.Style = fsDouble
+          Frame.Typ = [ftTop, ftBottom]
+          HAlign = haCenter
+          Memo.UTF8 = (
+            'Jumlah')
+          ParentFont = False
+        end
+        object Memo15: TfrxMemoView
+          Left = 453.543600000000000000
+          Top = 49.133890000000000000
+          Width = 302.362277950000000000
+          Height = 18.897637800000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clNavy
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Color = clMaroon
+          Frame.Style = fsDouble
+          Frame.Typ = [ftTop, ftBottom]
+          HAlign = haCenter
+          Memo.UTF8 = (
+            'Memo')
+          ParentFont = False
+        end
+        object Memo17: TfrxMemoView
+          Left = 3.779530000000000000
+          Top = 3.779530000000000000
+          Width = 336.378170000000000000
+          Height = 18.897650000000000000
+          Memo.UTF8 = (
+            'No. Referensi : [DS_KasKeluar."kodepengeluaran"]')
+        end
+        object Memo19: TfrxMemoView
+          Left = 3.779530000000000000
+          Top = 22.677180000000000000
+          Width = 336.378170000000000000
+          Height = 18.897650000000000000
+          DisplayFormat.FormatStr = 'dd MMMM yyyy'
+          DisplayFormat.Kind = fkDateTime
+          Memo.UTF8 = (
+            'Tgl. Transaksi : [DS_KasKeluar."tgltransaksi"]')
+        end
+        object Memo44: TfrxMemoView
+          Top = 49.133890000000000000
+          Width = 94.488127950000000000
+          Height = 18.897637800000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clNavy
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Color = clMaroon
+          Frame.Style = fsDouble
+          Frame.Typ = [ftTop, ftBottom]
+          HAlign = haCenter
+          Memo.UTF8 = (
+            'Kode')
+          ParentFont = False
+        end
+        object Memo23: TfrxMemoView
+          Left = 415.748300000000000000
+          Top = 3.779530000000000000
+          Width = 336.378170000000000000
+          Height = 18.897650000000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clNavy
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          HAlign = haRight
+          Memo.UTF8 = (
+            '[DS_KasKeluar."kodekas"] | [DS_KasKeluar."namakas"]')
+          ParentFont = False
+          Formats = <
+            item
+              FormatStr = 'dd MMMM yyyy'
+              Kind = fkDateTime
+            end
+            item
+            end>
+        end
+      end
+      object GroupFooter1: TfrxGroupFooter
+        FillType = ftBrush
+        Height = 34.015770000000000000
+        Top = 325.039580000000000000
+        Width = 755.906000000000000000
+        object Memo18: TfrxMemoView
+          Align = baWidth
+          Width = 755.906000000000000000
+          Height = 3.779527560000000000
+          StretchMode = smActualHeight
+          DisplayFormat.FormatStr = '#,#0.##'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -13
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Typ = [ftTop]
+          ParentFont = False
+          VAlign = vaCenter
+        end
+        object Memo25: TfrxMemoView
+          Left = 563.149970000000000000
+          Top = 3.779530000000000000
+          Width = 79.370007950000000000
+          Height = 18.897637800000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -13
+          Font.Name = 'Century Gothic'
+          Font.Style = [fsBold, fsItalic]
+          Frame.Style = fsDouble
+          Memo.UTF8 = (
+            'Total :')
+          ParentFont = False
+        end
+        object Memo28: TfrxMemoView
+          Left = 642.520100000000000000
+          Top = 3.779530000000000000
+          Width = 113.385900000000000000
+          Height = 18.897637800000000000
+          StretchMode = smActualHeight
+          DataSetName = 'DSPembelianBarangSupplierFaktur'
+          DisplayFormat.FormatStr = '#,#0.##'
+          DisplayFormat.Kind = fkNumeric
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -13
+          Font.Name = 'Century Gothic'
+          Font.Style = [fsBold, fsItalic]
+          Frame.Width = 2.000000000000000000
+          HAlign = haRight
+          Memo.UTF8 = (
+            '[DS_KasKeluar."total"]')
+          ParentFont = False
+        end
+        object Memo3: TfrxMemoView
+          Align = baWidth
+          Top = 30.236240000000000000
+          Width = 755.906000000000000000
+          Height = 3.779527560000000000
+          StretchMode = smActualHeight
+          DisplayFormat.FormatStr = '#,#0.##'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -13
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Style = fsDot
+          Frame.Typ = [ftBottom]
+          ParentFont = False
+          VAlign = vaCenter
+        end
+      end
+    end
+  end
+  object Q_KartuStokBarangAwal: TZQuery
+    Connection = con
+    SQL.Strings = (
+      
+        'SELECT IFNULL(SUM(masuk-keluar),0)AS saldo FROM tbl_bukubesarbar' +
+        'ang WHERE tgltransaksi<:tkd AND nobarang=:nobarang GROUP BY noba' +
+        'rang')
+    Params = <
+      item
+        DataType = ftUnknown
+        Name = 'tkd'
+        ParamType = ptUnknown
+      end
+      item
+        DataType = ftUnknown
+        Name = 'nobarang'
+        ParamType = ptUnknown
+      end>
+    DataSource = DSKartuStokBarangAwal
+    Left = 600
+    Top = 389
+    ParamData = <
+      item
+        DataType = ftUnknown
+        Name = 'tkd'
+        ParamType = ptUnknown
+      end
+      item
+        DataType = ftUnknown
+        Name = 'nobarang'
+        ParamType = ptUnknown
+      end>
+  end
+  object DSKartuStokBarangAwal: TDataSource
+    DataSet = Q_KartuStokBarang
+    Left = 664
+    Top = 389
+  end
+  object frxDBDataset2: TfrxDBDataset
+    UserName = 'DS_KartuStokBarangAwal'
+    CloseDataSource = False
+    DataSet = Q_KartuStokBarangAwal
+    BCDToCurrency = False
+    Left = 632
+    Top = 388
+  end
+  object Rpt_PenjualanRincian5: TfrxReport
+    Version = '5.2.3'
+    DotMatrixReport = False
+    IniFile = '\Software\Fast Reports'
+    PreviewOptions.Buttons = [pbPrint, pbLoad, pbSave, pbExport, pbZoom, pbFind, pbOutline, pbPageSetup, pbTools, pbEdit, pbNavigator, pbExportQuick]
+    PreviewOptions.Zoom = 1.000000000000000000
+    PrintOptions.Printer = 'Default'
+    PrintOptions.PrintOnSheet = 0
+    ReportOptions.CreateDate = 41624.593323761600000000
+    ReportOptions.LastChange = 41624.593323761600000000
+    ScriptLanguage = 'PascalScript'
+    ScriptText.Strings = (
+      'begin'
+      ''
+      'end.')
+    Left = 1288
+    Top = 316
+    Datasets = <
+      item
+        DataSet = DS_PenjualanRincian5
+        DataSetName = 'DS_PenjualanRincian5'
+      end
+      item
+        DataSet = DSPerusahaan
+        DataSetName = 'DSPerusahaan'
+      end>
+    Variables = <>
+    Style = <>
+    object Data: TfrxDataPage
+      Height = 1000.000000000000000000
+      Width = 1000.000000000000000000
+    end
+    object Page1: TfrxReportPage
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -11
+      Font.Name = 'Century Gothic'
+      Font.Style = []
+      PaperWidth = 210.000000000000000000
+      PaperHeight = 297.000000000000000000
+      PaperSize = 9
+      LeftMargin = 5.000000000000000000
+      RightMargin = 5.000000000000000000
+      TopMargin = 5.000000000000000000
+      BottomMargin = 5.000000000000000000
+      object ReportTitle1: TfrxReportTitle
+        FillType = ftBrush
+        Height = 102.047292910000000000
+        Top = 18.897650000000000000
+        Width = 755.906000000000000000
+        object Memo1: TfrxMemoView
+          Align = baWidth
+          Top = 18.897650000000000000
+          Width = 755.906000000000000000
+          Height = 26.456692910000000000
+          AutoWidth = True
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -16
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          HAlign = haCenter
+          Memo.UTF8 = (
+            '[DSPerusahaan."nama"]')
+          ParentFont = False
+          VAlign = vaCenter
+        end
+        object Memo4: TfrxMemoView
+          Align = baWidth
+          Top = 45.354360000000000000
+          Width = 755.906000000000000000
+          Height = 26.456692910000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clNavy
+          Font.Height = -21
+          Font.Name = 'Century Gothic'
+          Font.Style = [fsBold]
+          Frame.Width = 2.000000000000000000
+          HAlign = haCenter
+          Memo.UTF8 = (
+            'Lap. Penjualan By Product Tester')
+          ParentFont = False
+          VAlign = vaCenter
+        end
+        object SysMemo2: TfrxSysMemoView
+          Width = 94.488250000000000000
+          Height = 18.897637795275600000
+          AutoWidth = True
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Memo.UTF8 = (
+            '[DATE], [TIME]')
+          ParentFont = False
+        end
+        object txtperiode: TfrxMemoView
+          Align = baWidth
+          Top = 71.811070000000000000
+          Width = 755.906000000000000000
+          Height = 18.897637800000000000
+          AutoWidth = True
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clMaroon
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          HAlign = haCenter
+          ParentFont = False
+          VAlign = vaCenter
+        end
+      end
+      object MasterData1: TfrxMasterData
+        FillType = ftBrush
+        Height = 22.677177560000000000
+        Top = 226.771800000000000000
+        Width = 755.906000000000000000
+        DataSet = DS_PenjualanRincian5
+        DataSetName = 'DS_PenjualanRincian5'
+        RowCount = 0
+        Stretched = True
+        object Memo11: TfrxMemoView
+          Left = 113.385900000000000000
+          Width = 226.771800000000000000
+          Height = 18.897637800000000000
+          StretchMode = smActualHeight
+          DataField = 'namabarang'
+          DataSet = DS_PenjualanRincian5
+          DataSetName = 'DS_PenjualanRincian5'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Width = 2.000000000000000000
+          Memo.UTF8 = (
+            '[DS_PenjualanRincian5."namabarang"]')
+          ParentFont = False
+          Formats = <
+            item
+            end
+            item
+            end>
+        end
+        object Memo12: TfrxMemoView
+          Left = 340.157700000000000000
+          Width = 75.590600000000000000
+          Height = 18.897637800000000000
+          StretchMode = smActualHeight
+          DataField = 'stok'
+          DataSet = DS_PenjualanRincian5
+          DataSetName = 'DS_PenjualanRincian5'
+          DisplayFormat.FormatStr = '#,#0.##'
+          DisplayFormat.Kind = fkNumeric
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Width = 2.000000000000000000
+          HAlign = haRight
+          Memo.UTF8 = (
+            '[DS_PenjualanRincian5."stok"]')
+          ParentFont = False
+        end
+        object Memo8: TfrxMemoView
+          Left = 642.520100000000000000
+          Width = 109.606370000000000000
+          Height = 18.897637800000000000
+          StretchMode = smActualHeight
+          DataSet = DS_PenjualanRincian5
+          DataSetName = 'DS_PenjualanRincian5'
+          DisplayFormat.FormatStr = '#,#0.##'
+          DisplayFormat.Kind = fkNumeric
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Width = 2.000000000000000000
+          HAlign = haRight
+          Memo.UTF8 = (
+            
+              '[<DS_PenjualanRincian5."dppbarang">+<DS_PenjualanRincian5."ppnba' +
+              'rang">]')
+          ParentFont = False
+        end
+        object Memo23: TfrxMemoView
+          Left = 415.748300000000000000
+          Width = 113.385900000000000000
+          Height = 18.897637800000000000
+          StretchMode = smActualHeight
+          DataSet = DS_PenjualanRincian5
+          DataSetName = 'DS_PenjualanRincian5'
+          DisplayFormat.FormatStr = '#,#0.##'
+          DisplayFormat.Kind = fkNumeric
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Width = 2.000000000000000000
+          HAlign = haRight
+          Memo.UTF8 = (
+            '[DS_PenjualanRincian5."dppbarang"]')
+          ParentFont = False
+        end
+        object Memo24: TfrxMemoView
+          Left = 529.134200000000000000
+          Width = 113.385900000000000000
+          Height = 18.897637800000000000
+          StretchMode = smActualHeight
+          DataSet = DS_PenjualanRincian5
+          DataSetName = 'DS_PenjualanRincian5'
+          DisplayFormat.FormatStr = '#,#0.##'
+          DisplayFormat.Kind = fkNumeric
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Width = 2.000000000000000000
+          HAlign = haRight
+          Memo.UTF8 = (
+            '[DS_PenjualanRincian5."ppnbarang"]')
+          ParentFont = False
+        end
+        object Memo45: TfrxMemoView
+          Width = 113.385900000000000000
+          Height = 18.897637800000000000
+          StretchMode = smActualHeight
+          DataSet = DS_PenjualanRincian5
+          DataSetName = 'DS_PenjualanRincian5'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Width = 2.000000000000000000
+          Memo.UTF8 = (
+            '[DS_PenjualanRincian5."kodebarang"]')
+          ParentFont = False
+        end
+      end
+      object PageFooter1: TfrxPageFooter
+        FillType = ftBrush
+        Height = 26.456710000000000000
+        Top = 521.575140000000000000
+        Width = 755.906000000000000000
+        object Memo52: TfrxMemoView
+          Align = baWidth
+          Top = 3.779529999999999000
+          Width = 755.906000000000000000
+          Height = 3.779527559055120000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -13
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Typ = [ftTop]
+          Frame.Width = 2.000000000000000000
+          ParentFont = False
+          VAlign = vaCenter
+        end
+        object SysMemo1: TfrxSysMemoView
+          Top = 7.559059999999999000
+          Width = 151.181200000000000000
+          Height = 18.897637795275600000
+          AutoWidth = True
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Memo.UTF8 = (
+            'Halaman : [PAGE#]')
+          ParentFont = False
+        end
+      end
+      object ReportSummary1: TfrxReportSummary
+        FillType = ftBrush
+        Height = 188.976500000000000000
+        Top = 309.921460000000000000
+        Width = 755.906000000000000000
+        object Memo30: TfrxMemoView
+          Left = 374.173470000000000000
+          Top = 45.354360000000000000
+          Width = 102.047310000000000000
+          Height = 18.897650000000000000
+          Memo.UTF8 = (
+            'Dibuat Oleh,')
+        end
+        object Memo31: TfrxMemoView
+          Left = 510.236550000000000000
+          Top = 45.354360000000000000
+          Width = 102.047310000000000000
+          Height = 18.897650000000000000
+          Memo.UTF8 = (
+            'Diketahui Oleh,')
+        end
+        object Memo32: TfrxMemoView
+          Left = 650.079160000000000000
+          Top = 45.354360000000000000
+          Width = 102.047310000000000000
+          Height = 18.897650000000000000
+          Memo.UTF8 = (
+            'Disetujui Oleh,')
+        end
+        object Memo33: TfrxMemoView
+          Left = 374.173470000000000000
+          Top = 139.842610000000000000
+          Width = 102.047310000000000000
+          Height = 18.897650000000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Typ = [ftTop]
+          Memo.UTF8 = (
+            'Tanggal:')
+          ParentFont = False
+        end
+        object Memo34: TfrxMemoView
+          Left = 510.236550000000000000
+          Top = 139.842610000000000000
+          Width = 102.047310000000000000
+          Height = 18.897650000000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Typ = [ftTop]
+          Memo.UTF8 = (
+            'Tanggal:')
+          ParentFont = False
+        end
+        object Memo35: TfrxMemoView
+          Left = 650.079160000000000000
+          Top = 139.842610000000000000
+          Width = 102.047310000000000000
+          Height = 18.897650000000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Typ = [ftTop]
+          Memo.UTF8 = (
+            'Tanggal:')
+          ParentFont = False
+        end
+        object Memo36: TfrxMemoView
+          Left = 574.488560000000000000
+          Top = 7.559060000000000000
+          Width = 64.251887950000000000
+          Height = 18.897637800000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = [fsBold]
+          Frame.Style = fsDouble
+          Memo.UTF8 = (
+            'Total  :')
+          ParentFont = False
+        end
+        object Memo37: TfrxMemoView
+          Left = 638.740570000000000000
+          Top = 7.559060000000000000
+          Width = 113.385900000000000000
+          Height = 18.897637800000000000
+          StretchMode = smActualHeight
+          DataSetName = 'DSPembelianBarangSupplierFaktur'
+          DisplayFormat.FormatStr = '#,#0.##'
+          DisplayFormat.Kind = fkNumeric
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = [fsBold]
+          Frame.Width = 2.000000000000000000
+          HAlign = haRight
+          Memo.UTF8 = (
+            
+              '[<SUM(<DS_PenjualanRincian5."dppbarang">,MasterData1)>+<SUM(<DS_' +
+              'PenjualanRincian5."ppnbarang">,MasterData1)>]')
+          ParentFont = False
+        end
+        object Memo41: TfrxMemoView
+          Align = baWidth
+          Top = 26.456710000000000000
+          Width = 755.906000000000000000
+          Height = 3.779527560000000000
+          StretchMode = smActualHeight
+          DisplayFormat.FormatStr = '#,#0.##'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -13
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Color = clMaroon
+          Frame.Typ = [ftBottom]
+          Frame.Width = 2.000000000000000000
+          ParentFont = False
+          VAlign = vaCenter
+        end
+        object Memo42: TfrxMemoView
+          Align = baWidth
+          Top = 3.779530000000000000
+          Width = 755.906000000000000000
+          Height = 3.779527560000000000
+          StretchMode = smActualHeight
+          DisplayFormat.FormatStr = '#,#0.##'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -13
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Color = clMaroon
+          Frame.Typ = [ftTop]
+          Frame.Width = 2.000000000000000000
+          ParentFont = False
+          VAlign = vaCenter
+        end
+      end
+      object PageHeader1: TfrxPageHeader
+        FillType = ftBrush
+        Height = 22.677180000000000000
+        Top = 143.622140000000000000
+        Width = 755.906000000000000000
+        object Memo5: TfrxMemoView
+          Left = 113.385900000000000000
+          Top = 3.779530000000000000
+          Width = 226.771677950000000000
+          Height = 18.897637800000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clNavy
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Color = clMaroon
+          Frame.Style = fsDouble
+          Frame.Typ = [ftTop, ftBottom]
+          HAlign = haCenter
+          Memo.UTF8 = (
+            'Nama')
+          ParentFont = False
+        end
+        object Memo26: TfrxMemoView
+          Left = 340.157700000000000000
+          Top = 3.779530000000000000
+          Width = 75.590477950000000000
+          Height = 18.897637800000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clNavy
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Color = clMaroon
+          Frame.Style = fsDouble
+          Frame.Typ = [ftTop, ftBottom]
+          HAlign = haCenter
+          Memo.UTF8 = (
+            'Qty. Terjual')
+          ParentFont = False
+        end
+        object Memo9: TfrxMemoView
+          Left = 415.748300000000000000
+          Top = 3.779530000000000000
+          Width = 113.385777950000000000
+          Height = 18.897637800000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clNavy
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Color = clMaroon
+          Frame.Style = fsDouble
+          Frame.Typ = [ftTop, ftBottom]
+          HAlign = haCenter
+          Memo.UTF8 = (
+            'DPP')
+          ParentFont = False
+        end
+        object Memo15: TfrxMemoView
+          Left = 642.520100000000000000
+          Top = 3.779530000000000000
+          Width = 113.385777950000000000
+          Height = 18.897637800000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clNavy
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Color = clMaroon
+          Frame.Style = fsDouble
+          Frame.Typ = [ftTop, ftBottom]
+          HAlign = haCenter
+          Memo.UTF8 = (
+            'Total')
+          ParentFont = False
+        end
+        object Memo21: TfrxMemoView
+          Left = 529.134200000000000000
+          Top = 3.779530000000000000
+          Width = 113.385777950000000000
+          Height = 18.897637800000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clNavy
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Color = clMaroon
+          Frame.Style = fsDouble
+          Frame.Typ = [ftTop, ftBottom]
+          HAlign = haCenter
+          Memo.UTF8 = (
+            'PPN')
+          ParentFont = False
+        end
+        object Memo44: TfrxMemoView
+          Top = 3.779530000000000000
+          Width = 113.385777950000000000
+          Height = 18.897637800000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clNavy
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Color = clMaroon
+          Frame.Style = fsDouble
+          Frame.Typ = [ftTop, ftBottom]
+          HAlign = haCenter
+          Memo.UTF8 = (
+            'Kode Barang')
+          ParentFont = False
+        end
+      end
+    end
+  end
+  object DS_PenjualanRincian5: TfrxDBDataset
+    UserName = 'DS_PenjualanRincian5'
+    CloseDataSource = False
+    DataSet = Q_PenjualanRincian5
+    BCDToCurrency = False
+    Left = 1320
+    Top = 316
+  end
+  object Q_PenjualanRincian5: TZQuery
+    Connection = con
+    SQL.Strings = (
+      'SELECT a.*,b.kodebarang,b.namabarang FROM'
+      
+        '(SELECT b.nobarang,IFNULL(SUM(b.qty*b.nilai),0) AS stok,SUM(b.dp' +
+        'pbarang)AS dppbarang,SUM(b.ppnbarang)AS ppnbarang FROM'
+      '(SELECT b.nobarang,b.qty,b.nilai,b.dppbarang,b.ppnbarang FROM'
+      
+        '(SELECT nopenjualaninvoice AS noref FROM tbl_penjualaninvoice WH' +
+        'ERE tglpenjualaninvoice BETWEEN :tkd AND :tks)AS a'
+      
+        'LEFT JOIN tbl_penjualaninvoicedetail AS b ON b.nopenjualaninvoic' +
+        'e=a.noref having b.dppbarang<=0'
+      'UNION ALL'
+      'SELECT b.nobarang,b.qty,b.nilai,b.dppbarang,b.ppnbarang FROM'
+      
+        '(SELECT nopenjualantunai AS noref FROM tbl_penjualantunai WHERE ' +
+        'tgltransaksi BETWEEN :tkd AND :tks)AS a'
+      
+        'LEFT JOIN tbl_penjualantunaidetail AS b ON b.nopenjualantunai=a.' +
+        'noref having b.dppbarang<=0)AS b GROUP BY b.nobarang)AS a'
+      
+        'LEFT JOIN tbl_barang AS b ON b.nobarang=a.nobarang ORDER BY b.na' +
+        'mabarang')
+    Params = <
+      item
+        DataType = ftUnknown
+        Name = 'tkd'
+        ParamType = ptUnknown
+      end
+      item
+        DataType = ftUnknown
+        Name = 'tks'
+        ParamType = ptUnknown
+      end>
+    Left = 1352
+    Top = 316
+    ParamData = <
+      item
+        DataType = ftUnknown
+        Name = 'tkd'
+        ParamType = ptUnknown
+      end
+      item
+        DataType = ftUnknown
+        Name = 'tks'
+        ParamType = ptUnknown
+      end>
   end
 end

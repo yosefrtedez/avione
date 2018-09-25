@@ -228,7 +228,7 @@ object Frm_PenjualanPengiriman: TFrm_PenjualanPengiriman
         Font.Style = []
         ParentFont = False
         TabOrder = 2
-        Text = '16/04/2017'
+        Text = '4/16/2017'
         OnChange = dtpfakturChange
         HideFocus = False
         Date = 42841.000000000000000000

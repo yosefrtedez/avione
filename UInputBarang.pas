@@ -121,7 +121,7 @@ var
 
 implementation
 
-uses UDM, NxCells, UDataSatuan, UDataAkun, UDataKelompokBarang, UDataPajak;
+uses UDM, NxCells, UDataSatuan, UDataAkun, UDataKelompokBarang, UDataPajak, UMain;
 
 {$R *.dfm}
 
@@ -158,7 +158,16 @@ begin
   txtjual.Value := 0;
   txtpajakjual.Text := '-';
   LPajakPenjualan.Caption := '0';
-  txthpp.Value := 0;    
+  txthpp.Value := 0;
+  if DM.CekAkses(Frm_Main.txtuser.Caption,'Data11')=False then begin
+    txthpp.Visible := False;
+    Label5.Visible := False;
+    Label11.Visible := False;
+  end else begin
+    txthpp.Visible := True;
+    Label5.Visible := True;
+    Label11.Visible := True;
+  end;
   DBGHarga.ClearRows;
 end;
 

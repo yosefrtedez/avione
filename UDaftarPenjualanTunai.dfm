@@ -154,6 +154,7 @@ object Frm_DaftarPenjualanTunai: TFrm_DaftarPenjualanTunai
       Font.Style = []
       ParentFont = False
       TabOrder = 1
+      Visible = False
       OnClick = BtnVariabelClick
     end
   end

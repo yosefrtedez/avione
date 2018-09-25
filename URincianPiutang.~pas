@@ -374,6 +374,7 @@ begin
           txtpenjualan.Text := FieldValues['kodepenjualaninvoice'];
           LNoPenjualan.Caption := FieldValues['nopenjualaninvoice'];
           LPiutang.Caption := FieldValues['noakunpiutang'];
+          txtketerangan.Text := FieldValues['keterangan'];
           Close;
           SQL.Clear;
           SQL.Text := 'select a.*,b.kodeakun from ' +

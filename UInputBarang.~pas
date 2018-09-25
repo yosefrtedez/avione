@@ -210,6 +210,8 @@ procedure TFrm_InputBarang.txtakunhppButtonClick(Sender: TObject);
 begin
   Application.CreateForm(TFrm_DataAkun, Frm_DataAkun);
   akunkas := -1;
+  noklas := 0;
+  nosubklas := 0;
   Frm_DataAkun.RefreshQ;
   if Frm_DataAkun.ShowModal = mrok then begin
     txtakunhpp.Text := Frm_DataAkun.QData.FieldValues['kodeakun']+'|'+Frm_DataAkun.QData.FieldValues['namaakun'];
@@ -221,6 +223,8 @@ procedure TFrm_InputBarang.txtakunpersediaanButtonClick(Sender: TObject);
 begin
   Application.CreateForm(TFrm_DataAkun, Frm_DataAkun);
   akunkas := -1;
+  noklas := 0;
+  nosubklas := 0;
   Frm_DataAkun.RefreshQ;
   if Frm_DataAkun.ShowModal = mrok then begin
     txtakunpersediaan.Text := Frm_DataAkun.QData.FieldValues['kodeakun']+'|'+Frm_DataAkun.QData.FieldValues['namaakun'];

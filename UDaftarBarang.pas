@@ -64,6 +64,9 @@ type
     BtnGudang: TRzToolButton;
     LGudang: TRzLabel;
     ATipe: TRzLabel;
+    QDatanogudang: TLargeintField;
+    QDatanamagudang: TStringField;
+    dbgdataDBTableView1namagudang: TcxGridDBColumn;
     procedure DBGDataDblClick(Sender: TObject);
     procedure BtnBaruClick(Sender: TObject);
     procedure BtnUbahClick(Sender: TObject);

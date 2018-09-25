@@ -116,7 +116,7 @@ procedure TFrm_PenjualanPengiriman.ClearText;
 begin
   LID.Caption := '0';
   dtpfaktur.Date := tanggalserver;
-  txtreferensi.Text := DM.GenerateKodeTransaksi(' ',dtpfaktur.Date);
+  txtreferensi.Text := DM.GenerateKodeTransaksi('SJ',dtpfaktur.Date);
   txtcustomer.Clear;
   LCustomer.Caption := '0';
   dbgbarang.ClearRows;
@@ -348,13 +348,25 @@ begin
             SQL.Text := 'delete from tbl_penjualankirimdetail where nopenjualankirim=:np';
             ParamByName('np').Value := LID.Caption;
             ExecSQL;
-            {Close;
+            Close;
             SQL.Clear;
             SQL.Text := 'delete from tbl_bukubesarbarang where noreferensi=:np and tipe=:t';
             ParamByName('np').Value := LID.Caption;
             ParamByName('t').Value := 'DO';
             ExecSQL;
             Close;
+            SQL.Clear;
+            SQL.Text := 'delete from tbl_bukubesarakun where noreferensi=:np and tipe=:t';
+            ParamByName('np').Value := LID.Caption;
+            ParamByName('t').Value := 'DO';
+            ExecSQL;
+            Close;
+            SQL.Clear;
+            SQL.Text := 'delete from tbl_bukubesarlaba where noreferensi=:np and tipe=:t';
+            ParamByName('np').Value := LID.Caption;
+            ParamByName('t').Value := 'DO';
+            ExecSQL;
+            {Close;
             SQL.Clear;
             SQL.Text := 'delete from tbl_bukubesarbarangdetail where noreferensi=:np and tipe=:t';
             ParamByName('np').Value := LID.Caption;
@@ -390,6 +402,30 @@ begin
                   ParamByName('u').Value := Cell[24,i].AsInteger;
                   ParamByName('v').Value := Cell[25,i].AsInteger;
                   ExecSQL;
+                  if Cell[23,i].AsInteger = 0 then begin
+                    Close;
+                    SQL.Clear;
+                    //masuk tabel buku besar barang
+                    SQL.Text := 'insert into tbl_bukubesarbarang(nobuku,nobarang,tipe,nogudang,tgltransaksi,noreferensi,keterangan,keluar,hpp,hargajual) values (:a,:b,:c,:d,:e,:f,:g,:h,:i,:j)';
+                    //ParamByName('a').Value := DM.GenerateNoMaster('bukubarang');
+                    ParamByName('b').Value := Cell[10,i].AsInteger;
+                    ParamByName('c').Value := 'DO';
+                    ParamByName('d').Value := LGUdang.Caption;
+                    ParamByName('e').Value := FormatDateTime('yyyy-mm-dd',dtpfaktur.Date);
+                    ParamByName('f').Value := LID.Caption;
+                    ParamByName('g').Value := 'Pengiriman Barang '+txtcustomer.Text+', '+txtreferensi.Text;
+                    ParamByName('h').Value := Cell[3,i].AsFloat*dbgbarang.Cell[12,i].AsFloat;
+                    hpp := DM.HitungHPPPenjualan(Cell[10,i].AsInteger,Cell[3,i].AsFloat*dbgbarang.Cell[12,i].AsFloat);
+                    ParamByName('i').Value := hpp;
+                    ParamByName('j').Value := (Cell[8,i].AsFloat/(Cell[3,i].AsFloat*dbgbarang.Cell[12,i].AsFloat));
+                    ExecSQL;
+                    //masuk buku besar barang detail
+                    DM.AmbilNoBuku(Cell[10,i].AsInteger,StrToInt(LGUdang.Caption),Cell[3,i].AsFloat*Cell[12,i].AsFloat,notransaksi,'DO');
+
+                    DM.InsertBukuBesarAkun(Cell[15,i].AsInteger,Date,'DO',StrtoInt(LID.Caption),'Delivery Order, No. '+txtreferensi.Text,hpp*Cell[3,i].AsFloat*Cell[12,i].AsFloat,0);
+                    DM.InsertBukuBesarAkun(Cell[13,i].AsInteger,Date,'DO',StrtoInt(LID.Caption),'Delivery Order, No. '+txtreferensi.Text,0,hpp*Cell[3,i].AsFloat*Cell[12,i].AsFloat);
+
+                  end;
                   {if Cell[23,i].AsInteger = 0 then begin
                     Close;
                     SQL.Clear;
@@ -433,7 +469,7 @@ begin
           dbgbarang.AddRow();
         end;
       end else begin
-        MessageDlg('Data tidak dapat diubah. Invoice telah dicetak !!',mtError,[mbOK],0);
+        MessageDlg('Data sudah di Approve. Data tidak dapat diubah !!',mtError,[mbOK],0);
       end;
     end;
     Free;

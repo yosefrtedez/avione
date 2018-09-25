@@ -78,7 +78,6 @@ type
     DSKasAwal: TfrxDBDataset;
     DSKas: TfrxDBDataset;
     DSSKasAwal: TDataSource;
-    Rpt_KasKeluar: TfrxReport;
     Rpt_BukuKas: TfrxReport;
     Q_KasMasuk: TZQuery;
     DS_KasMasuk: TfrxDBDataset;
@@ -243,6 +242,21 @@ type
     QPenjualanRangkuman3: TZQuery;
     DSPenjualanRangkuman3: TfrxDBDataset;
     Rpt_PenjualanRangkuman3: TfrxReport;
+    DSPenjualanRangkuman3Retur: TfrxDBDataset;
+    QPenjualanRangkuman3Retur: TZQuery;
+    Rpt_PenjualanRincian4: TfrxReport;
+    DS_PenjualanRincian4: TfrxDBDataset;
+    Q_PenjualanRincian4: TZQuery;
+    Rpt_KartuStokBarang: TfrxReport;
+    Q_KartuStokBarang: TZQuery;
+    DS_KartuStokBarang: TfrxDBDataset;
+    Rpt_KasKeluar: TfrxReport;
+    Q_KartuStokBarangAwal: TZQuery;
+    DSKartuStokBarangAwal: TDataSource;
+    frxDBDataset2: TfrxDBDataset;
+    Rpt_PenjualanRincian5: TfrxReport;
+    DS_PenjualanRincian5: TfrxDBDataset;
+    Q_PenjualanRincian5: TZQuery;
     procedure DataModuleCreate(Sender: TObject);
   private
     { Private declarations }
@@ -276,6 +290,7 @@ type
     function GenerateNoMaster(AJenis:string): Integer;
     function GenerateKodeTransaksi(AJenis:string;DateLD: TDateTime): string;
     function GenerateTransaksiDetil(ATipe: string;ANoRef:Integer): Integer;
+    function GenerateKodeFaktur(kodefaktur: Double): string;
 
     procedure CekUpdate;
     function CekAkses(AUser,AAkses:string):Boolean;
@@ -1571,6 +1586,24 @@ begin
     end;
     Free;
   end;
+end;
+
+function TDM.GenerateKodeFaktur(kodefaktur: Double): string;
+begin
+  Result:= FloatToStr(kodefaktur);
+  if Length(Result)=1 then Result:='000000000000'+Result;
+  if Length(Result)=2 then Result:='00000000000'+Result;
+  if Length(Result)=3 then Result:='0000000000'+Result;
+  if Length(Result)=4 then Result:='000000000'+Result;
+  if Length(Result)=5 then Result:='00000000'+Result;
+  if Length(Result)=6 then Result:='0000000'+Result;
+  if Length(Result)=7 then Result:='000000'+Result;
+  if Length(Result)=8 then Result:='00000'+Result;
+  if Length(Result)=9 then Result:='0000'+Result;
+  if Length(Result)=10 then Result:='000'+Result;
+  if Length(Result)=11 then Result:='00'+Result;
+  if Length(Result)=12 then Result:='0'+Result;
+  Result:=Result;
 end;
 
 end.

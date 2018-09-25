@@ -55,6 +55,7 @@ type
     QDatatotal: TFloatField;
     QDatanamauser: TStringField;
     QDatanamakontak: TStringField;
+    BtnVariabel: TRzBitBtn;
     procedure BtnSelesaiClick(Sender: TObject);
     procedure BtnHapusClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -63,6 +64,7 @@ type
     procedure BtnCetakClick(Sender: TObject);
     procedure dbgdataDBTableView1DblClick(Sender: TObject);
     procedure RzBitBtn1Click(Sender: TObject);
+    procedure BtnVariabelClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -76,7 +78,7 @@ var
 
 implementation
 
-uses UDM, UPenjualanTunai, UFTanggal, UMain;
+uses UDM, UPenjualanTunai, UFTanggal, UMain, UInputFakturPajak;
 
 {$R *.dfm}
 
@@ -349,6 +351,30 @@ begin
     DM.Rpt_JurnalVoucher.ShowReport(True);
   end;
 
+end;
+
+procedure TFrm_DaftarPenjualanTunai.BtnVariabelClick(Sender: TObject);
+begin
+  Application.CreateForm(TFrm_Variabel, Frm_Variabel);
+  Frm_Variabel.ClearText;
+  with TZQuery.Create(Self)do begin
+    Connection := dm.Con;
+    Close;
+    SQL.Text := 'select ifnull(kodefaktur,'+QuotedStr('')+')as kodefaktur from tbl_penjualantunai where nopenjualantunai=:np';
+    ParamByName('np').Value := QData.FieldValues['nopenjualantunai'];
+    Open;
+    Frm_Variabel.txtkode.Text := FieldValues['kodefaktur'];
+    if Frm_Variabel.ShowModal = mrok then begin
+      Close;
+      SQL.Clear;
+      SQL.Text := 'update tbl_penjualantunai set kodefaktur=:a where nopenjualantunai=:np';
+      ParamByName('np').Value := QData.FieldValues['nopenjualantunai'];
+      ParamByName('a').Value := Frm_Variabel.txtkode.Text;
+      ExecSQL;
+    end;
+    Free;
+  end;
+  RefreshQ;
 end;
 
 end.

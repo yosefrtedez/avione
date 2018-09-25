@@ -64,11 +64,11 @@ object Frm_SettingWewenang: TFrm_SettingWewenang
     Top = 0
     Width = 516
     Height = 332
-    ActivePage = TabSheet1
+    ActivePage = TabSheet6
     ActivePageDefault = TabSheet1
     Align = alClient
     BoldCurrentTab = True
-    TabIndex = 0
+    TabIndex = 5
     TabOrder = 0
     TabOrientation = toLeft
     TabSequence = tsReverse
@@ -1102,7 +1102,6 @@ object Frm_SettingWewenang: TFrm_SettingWewenang
   end
   object zqrCabang: TZReadOnlyQuery
     Connection = DM.con
-    Active = True
     SQL.Strings = (
       'SELECT nocabang, namacabang FROM tbl_cabang')
     Params = <>

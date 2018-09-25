@@ -94,7 +94,7 @@ object Frm_DaftarCetakCSV: TFrm_DaftarCetakCSV
       Font.Name = 'Calibri'
       Font.Style = []
       ParentFont = False
-      TabOrder = 4
+      TabOrder = 5
       OnClick = BtnSelesaiClick
     end
     object BtnPerincian: TRzBitBtn
@@ -110,7 +110,7 @@ object Frm_DaftarCetakCSV: TFrm_DaftarCetakCSV
       Font.Name = 'Calibri'
       Font.Style = []
       ParentFont = False
-      TabOrder = 3
+      TabOrder = 4
       Visible = False
       OnClick = BtnPerincianClick
     end
@@ -127,7 +127,7 @@ object Frm_DaftarCetakCSV: TFrm_DaftarCetakCSV
       Font.Name = 'Calibri'
       Font.Style = []
       ParentFont = False
-      TabOrder = 2
+      TabOrder = 3
       OnClick = BtnCSVClick
     end
     object BtnCheck: TRzBitBtn
@@ -158,6 +158,21 @@ object Frm_DaftarCetakCSV: TFrm_DaftarCetakCSV
       ParentFont = False
       TabOrder = 1
       OnClick = BtnUncheckClick
+    end
+    object BtnVariabel: TRzBitBtn
+      Left = 191
+      Top = 8
+      Width = 98
+      Caption = 'Faktur Pajak'
+      Color = 12615680
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clWhite
+      Font.Height = -13
+      Font.Name = 'Calibri'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 2
+      OnClick = BtnVariabelClick
     end
   end
   object dbgdata: TNextGrid
@@ -193,6 +208,7 @@ object Frm_DaftarCetakCSV: TFrm_DaftarCetakCSV
       Width = 30
     end
     object NxTextColumn1: TNxTextColumn
+      Color = clYellow
       DefaultWidth = 150
       Font.Charset = ANSI_CHARSET
       Font.Color = clWindowText
@@ -206,7 +222,23 @@ object Frm_DaftarCetakCSV: TFrm_DaftarCetakCSV
       SortType = stAlphabetic
       Width = 150
     end
+    object NxTextColumn6: TNxTextColumn
+      Color = clYellow
+      DefaultWidth = 150
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -13
+      Font.Name = 'Calibri'
+      Font.Style = []
+      Header.Color = clSkyBlue
+      Header.Caption = 'No. DO'
+      ParentFont = False
+      Position = 2
+      SortType = stAlphabetic
+      Width = 150
+    end
     object NxTextColumn4: TNxTextColumn
+      Color = clYellow
       DefaultWidth = 182
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
@@ -216,12 +248,12 @@ object Frm_DaftarCetakCSV: TFrm_DaftarCetakCSV
       Header.Color = clSkyBlue
       Header.Caption = 'Tanggal'
       ParentFont = False
-      Position = 2
+      Position = 3
       SortType = stAlphabetic
       Width = 182
     end
     object NxTextColumn2: TNxTextColumn
-      DefaultWidth = 199
+      DefaultWidth = 158
       Font.Charset = ANSI_CHARSET
       Font.Color = clWindowText
       Font.Height = -13
@@ -229,14 +261,15 @@ object Frm_DaftarCetakCSV: TFrm_DaftarCetakCSV
       Font.Style = []
       Header.Color = clSkyBlue
       Header.Caption = 'Faktur Pajak'
-      Options = [coAutoSize, coCanClick, coCanInput, coCanSort, coPublicUsing, coShowTextFitHint]
+      Options = [coAutoSize, coCanClick, coCanInput, coCanSort, coEditing, coEditorAutoSelect, coPublicUsing, coShowTextFitHint]
       ParentFont = False
-      Position = 3
+      Position = 4
       SortType = stAlphabetic
-      Width = 199
+      Width = 158
     end
     object NxTextColumn3: TNxTextColumn
-      DefaultWidth = 526
+      Color = clYellow
+      DefaultWidth = 417
       Font.Charset = ANSI_CHARSET
       Font.Color = clWindowText
       Font.Height = -13
@@ -246,11 +279,12 @@ object Frm_DaftarCetakCSV: TFrm_DaftarCetakCSV
       Header.Caption = 'Customer'
       Options = [coAutoSize, coCanClick, coCanInput, coCanSort, coPublicUsing, coShowTextFitHint]
       ParentFont = False
-      Position = 4
+      Position = 5
       SortType = stAlphabetic
-      Width = 526
+      Width = 417
     end
     object NxNumberColumn2: TNxNumberColumn
+      Color = clYellow
       DefaultValue = '0'
       DefaultWidth = 100
       Font.Charset = ANSI_CHARSET
@@ -263,7 +297,7 @@ object Frm_DaftarCetakCSV: TFrm_DaftarCetakCSV
       Header.Alignment = taRightJustify
       Options = [coCanClick, coCanInput, coCanSort, coEditorAutoSelect, coPublicUsing]
       ParentFont = False
-      Position = 5
+      Position = 6
       SortType = stNumeric
       Width = 100
       FormatMask = '#,#0.##'
@@ -272,6 +306,7 @@ object Frm_DaftarCetakCSV: TFrm_DaftarCetakCSV
       SpinButtons = False
     end
     object NxNumberColumn1: TNxNumberColumn
+      Color = clYellow
       DefaultValue = '0'
       DefaultWidth = 100
       Font.Charset = ANSI_CHARSET
@@ -283,7 +318,7 @@ object Frm_DaftarCetakCSV: TFrm_DaftarCetakCSV
       Header.Caption = 'PPN'
       Header.Alignment = taRightJustify
       ParentFont = False
-      Position = 6
+      Position = 7
       SortType = stNumeric
       Width = 100
       EditOptions = [eoAllowFloat, eoAllowSigns]
@@ -300,7 +335,7 @@ object Frm_DaftarCetakCSV: TFrm_DaftarCetakCSV
       Font.Style = []
       Header.Caption = 'nopenjualan'
       ParentFont = False
-      Position = 7
+      Position = 8
       SortType = stNumeric
       Visible = False
       Increment = 1.000000000000000000
@@ -315,7 +350,7 @@ object Frm_DaftarCetakCSV: TFrm_DaftarCetakCSV
       Font.Style = []
       Header.Caption = 'bulan'
       ParentFont = False
-      Position = 8
+      Position = 9
       SortType = stNumeric
       Visible = False
       Increment = 1.000000000000000000
@@ -330,7 +365,7 @@ object Frm_DaftarCetakCSV: TFrm_DaftarCetakCSV
       Font.Style = []
       Header.Caption = 'tahun'
       ParentFont = False
-      Position = 9
+      Position = 10
       SortType = stNumeric
       Visible = False
       Increment = 1.000000000000000000
@@ -344,7 +379,7 @@ object Frm_DaftarCetakCSV: TFrm_DaftarCetakCSV
       Font.Style = []
       Header.Caption = 'tipe'
       ParentFont = False
-      Position = 10
+      Position = 11
       SortType = stAlphabetic
       Visible = False
     end
@@ -353,19 +388,33 @@ object Frm_DaftarCetakCSV: TFrm_DaftarCetakCSV
     Connection = DM.con
     SQL.Strings = (
       'SELECT a.*,IFNULL(b.namakontak,'#39#39')AS namakontak FROM '
+      
+        '(SELECT a.*,IFNULL(b.kodepenjualanorder,'#39#39')AS kodepenjualanorder' +
+        ',IFNULL(b.kodepenjualando,'#39#39')AS kodepenjualando FROM'
+      
+        '(SELECT a.*,IFNULL(b.kodepenjualankirim,'#39#39')AS kodepenjualankirim' +
+        ',IFNULL(b.nopenjualanorder,'#39#39')AS nopenjualanorder FROM'
       '(SELECT a.* FROM'
       
         '(SELECT nopenjualaninvoice AS nopenjualan,kodepenjualaninvoice A' +
-        'S kodepenjualan,kodefaktur,'#39'SA'#39' AS tipe,tglpenjualaninvoice AS t' +
-        'gltransaksi,nokontak,totaldpp,totalppn FROM tbl_penjualaninvoice'
+        'S kodepenjualan,kodefaktur,nopenjualankirim,'#39'SA'#39' AS tipe,tglpenj' +
+        'ualaninvoice AS tgltransaksi,nokontak,totaldpp,totalppn FROM tbl' +
+        '_penjualaninvoice'
       'UNION'
       
         'SELECT nopenjualantunai AS nopenjualan,kodepenjualantunai AS kod' +
-        'epenjualan,kodefaktur,'#39'SP'#39' AS tipe,tgltransaksi,nokontak,totaldp' +
-        'p,totalpajak AS totalppn FROM tbl_penjualantunai)AS a '
+        'epenjualan,kodefaktur,0 as nopenjualankirim,'#39'SP'#39' AS tipe,tgltran' +
+        'saksi,nokontak,totaldpp,totalpajak AS totalppn FROM tbl_penjuala' +
+        'ntunai)AS a '
       
         'WHERE a.tgltransaksi BETWEEN :tkd AND :tks and kodefaktur<>'#39#39')AS' +
         ' a'
+      
+        'LEFT JOIN tbl_penjualankirim AS b ON b.nopenjualankirim=a.nopenj' +
+        'ualankirim)AS a'
+      
+        'LEFT JOIN tbl_penjualanorder AS b ON b.nopenjualanorder=a.nopenj' +
+        'ualanorder)AS a'
       'LEFT JOIN tbl_kontak AS b ON b.nokontak=a.nokontak'
       'ORDER BY a.tgltransaksi,a.kodepenjualan')
     Params = <
@@ -429,6 +478,29 @@ object Frm_DaftarCetakCSV: TFrm_DaftarCetakCSV
       FieldName = 'namakontak'
       ReadOnly = True
       Size = 50
+    end
+    object QDatanopenjualankirim: TLargeintField
+      FieldName = 'nopenjualankirim'
+      ReadOnly = True
+    end
+    object QDatakodepenjualankirim: TStringField
+      FieldName = 'kodepenjualankirim'
+      ReadOnly = True
+      Size = 15
+    end
+    object QDatanopenjualanorder: TStringField
+      FieldName = 'nopenjualanorder'
+      ReadOnly = True
+    end
+    object QDatakodepenjualanorder: TStringField
+      FieldName = 'kodepenjualanorder'
+      ReadOnly = True
+      Size = 15
+    end
+    object QDatakodepenjualando: TStringField
+      FieldName = 'kodepenjualando'
+      ReadOnly = True
+      Size = 15
     end
   end
   object DSData: TDataSource
