@@ -303,7 +303,7 @@ begin
       ParamByName('np').Value := QDetil.FieldValues['nopenjualaninvoice'];
       Open;
       if FieldValues['total']>0 then begin
-        MessageDlg('Invoice Pemnjualan tidak dapat dihapus, karena barang telah terpakai oleh transaksi pembayaran / retur'#10#13'Hapus dulu transaksi pembayaran atau retur untuk Transaksi ini.',mtError,[mbOK],0);
+        MessageDlg('Invoice Penjualan tidak dapat dihapus, karena barang telah terpakai oleh transaksi pembayaran / retur'#10#13'Hapus dulu transaksi pembayaran atau retur untuk Transaksi ini.',mtError,[mbOK],0);
         Free;
         Exit;
       end;

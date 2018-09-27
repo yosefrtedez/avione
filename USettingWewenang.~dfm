@@ -64,11 +64,11 @@ object Frm_SettingWewenang: TFrm_SettingWewenang
     Top = 0
     Width = 516
     Height = 332
-    ActivePage = TabSheet6
+    ActivePage = TabSheet3
     ActivePageDefault = TabSheet1
     Align = alClient
     BoldCurrentTab = True
-    TabIndex = 5
+    TabIndex = 1
     TabOrder = 0
     TabOrientation = toLeft
     TabSequence = tsReverse
@@ -392,6 +392,16 @@ object Frm_SettingWewenang: TFrm_SettingWewenang
           HotTrack = True
           State = cbUnchecked
           TabOrder = 9
+        end
+        object Data11: TRzCheckBox
+          Left = 168
+          Top = 48
+          Width = 161
+          Height = 17
+          Caption = 'View HPP'
+          HotTrack = True
+          State = cbUnchecked
+          TabOrder = 10
         end
       end
     end

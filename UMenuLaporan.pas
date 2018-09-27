@@ -1028,8 +1028,8 @@ begin
         DM.Q_KartuStokBarangAwal.ParamByName('tkd').Value := FormatDateTime('yyyy-mm-dd',dtpdari.Date);
         DM.Q_KartuStokBarang.ParamByName('tkd').Value := FormatDateTime('yyyy-mm-dd',dtpdari.Date);
         DM.Q_KartuStokBarang.ParamByName('tks').Value := FormatDateTime('yyyy-mm-dd',dtpsampai.Date);
-        DM.Q_KartuStokBarang.Open;
         DM.Q_KartuStokBarangAwal.Open;
+        DM.Q_KartuStokBarang.Open;
         t := TfrxMemoView(DM.Rpt_KartuStokBarang.FindObject('txtperiode'));
         t.Memo.Text := FormatDateTime('dd MMMM yyyy',dtpdari.Date)+' - ' +FormatDateTime('dd MMMM yyyy',dtpsampai.Date);
         if cbpreview.Checked = False then begin

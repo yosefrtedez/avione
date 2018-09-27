@@ -250,13 +250,13 @@ begin
             ExecSQL;
             Close;
             SQL.Clear;
-            SQL.Text := 'delete from tbl_bukubesarlaba where noreferensi=:np and tipe=:t';
+            SQL.Text := 'delete from tbl_laba where noreferensi=:np and tipe=:t';
             ParamByName('np').Value := QDetil.FieldValues['nopenjualankirim'];
             ParamByName('t').Value := 'DO';
             ExecSQL;
             Close;
             SQL.Clear;
-            SQL.Text := 'delete from tbl_bukubesarlaba where noreferensi=:np and tipe=:t';
+            SQL.Text := 'delete from tbl_laba where noreferensi=:np and tipe=:t';
             ParamByName('np').Value := QDetil.FieldValues['nopenjualankirim'];
             ParamByName('t').Value := 'SJ';
             ExecSQL;

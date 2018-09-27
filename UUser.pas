@@ -434,6 +434,15 @@ begin
             if not IsEmpty then
               Frm_SettingWewenang.BukuBesar3.Checked := True
             else Frm_SettingWewenang.BukuBesar3.Checked := False;
+            Close;
+            SQL.Clear;
+            SQL.Text := 'select * from tbl_userwewenang where namauser=:a and wewenang=:b';
+            ParamByName('a').Value := QUser.FieldValues['namauser'];
+            ParamByName('b').Value := 'BukuBesar4';
+            Open;
+            if not IsEmpty then
+              Frm_SettingWewenang.BukuBesar4.Checked := True
+            else Frm_SettingWewenang.BukuBesar4.Checked := False;
           end else begin
             Frm_SettingWewenang.cbbukubesar.Checked := False;
             Frm_SettingWewenang.cbbukubesarClick(nil);
@@ -979,6 +988,14 @@ begin
                 SQL.Text := 'insert into tbl_userwewenang values (:a,:b)';
                 ParamByName('a').Value := Frm_SettingWewenang.txtNama.Text;
                 ParamByName('b').Value := 'BukuBesar3';
+                ExecSQL;
+              end;
+              if Frm_SettingWewenang.BukuBesar4.Checked = True then begin
+                Close;
+                SQL.Clear;
+                SQL.Text := 'insert into tbl_userwewenang values (:a,:b)';
+                ParamByName('a').Value := Frm_SettingWewenang.txtNama.Text;
+                ParamByName('b').Value := 'BukuBesar4';
                 ExecSQL;
               end;
             end;
@@ -1533,6 +1550,15 @@ begin
             if not IsEmpty then
               Frm_SettingWewenang.BukuBesar3.Checked := True
             else Frm_SettingWewenang.BukuBesar3.Checked := False;
+            Close;
+            SQL.Clear;
+            SQL.Text := 'select * from tbl_userwewenang where namauser=:a and wewenang=:b';
+            ParamByName('a').Value := QUser.FieldValues['namauser'];
+            ParamByName('b').Value := 'BukuBesar4';
+            Open;
+            if not IsEmpty then
+              Frm_SettingWewenang.BukuBesar4.Checked := True
+            else Frm_SettingWewenang.BukuBesar4.Checked := False;
           end else begin
             Frm_SettingWewenang.cbbukubesar.Checked := False;
             Frm_SettingWewenang.cbbukubesarClick(nil);
@@ -2078,6 +2104,14 @@ begin
                 SQL.Text := 'insert into tbl_userwewenang values (:a,:b)';
                 ParamByName('a').Value := Frm_SettingWewenang.txtNama.Text;
                 ParamByName('b').Value := 'BukuBesar3';
+                ExecSQL;
+              end;
+              if Frm_SettingWewenang.BukuBesar4.Checked = True then begin
+                Close;
+                SQL.Clear;
+                SQL.Text := 'insert into tbl_userwewenang values (:a,:b)';
+                ParamByName('a').Value := Frm_SettingWewenang.txtNama.Text;
+                ParamByName('b').Value := 'BukuBesar4';
                 ExecSQL;
               end;
             end;
@@ -2709,6 +2743,14 @@ begin
             SQL.Text := 'insert into tbl_userwewenang values (:a,:b)';
             ParamByName('a').Value := Frm_SettingWewenang.txtNama.Text;
             ParamByName('b').Value := 'BukuBesar3';
+            ExecSQL;
+          end;
+          if Frm_SettingWewenang.BukuBesar4.Checked = True then begin
+            Close;
+            SQL.Clear;
+            SQL.Text := 'insert into tbl_userwewenang values (:a,:b)';
+            ParamByName('a').Value := Frm_SettingWewenang.txtNama.Text;
+            ParamByName('b').Value := 'BukuBesar4';
             ExecSQL;
           end;
         end;

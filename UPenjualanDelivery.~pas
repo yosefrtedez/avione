@@ -116,7 +116,7 @@ procedure TFrm_PenjualanPengiriman.ClearText;
 begin
   LID.Caption := '0';
   dtpfaktur.Date := tanggalserver;
-  txtreferensi.Text := DM.GenerateKodeTransaksi(' ',dtpfaktur.Date);
+  txtreferensi.Text := DM.GenerateKodeTransaksi('SJ',dtpfaktur.Date);
   txtcustomer.Clear;
   LCustomer.Caption := '0';
   dbgbarang.ClearRows;
@@ -360,6 +360,12 @@ begin
             ParamByName('np').Value := LID.Caption;
             ParamByName('t').Value := 'DO';
             ExecSQL;
+            Close;
+            SQL.Clear;
+            SQL.Text := 'delete from tbl_bukubesarlaba where noreferensi=:np and tipe=:t';
+            ParamByName('np').Value := LID.Caption;
+            ParamByName('t').Value := 'DO';
+            ExecSQL;
             {Close;
             SQL.Clear;
             SQL.Text := 'delete from tbl_bukubesarbarangdetail where noreferensi=:np and tipe=:t';
@@ -463,7 +469,7 @@ begin
           dbgbarang.AddRow();
         end;
       end else begin
-        MessageDlg('Data tidak dapat diubah. Invoice telah dicetak !!',mtError,[mbOK],0);
+        MessageDlg('Data sudah di Approve. Data tidak dapat diubah !!',mtError,[mbOK],0);
       end;
     end;
     Free;

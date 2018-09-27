@@ -69316,13 +69316,14 @@ object DM: TDM
       
         '(SELECT nopenjualaninvoice AS noref,kodepenjualaninvoice AS kode' +
         'ref,tglpenjualaninvoice AS tgltransaksi,nopenjualankirim,nokonta' +
-        'k,total FROM tbl_penjualaninvoice where tglpenjualaninvoice betw' +
-        'een :tkd and :tks'
+        'k,total-biayalain as total FROM tbl_penjualaninvoice where tglpe' +
+        'njualaninvoice between :tkd and :tks'
       'UNION'
       
         'SELECT nopenjualantunai AS noref,kodepenjualantunai AS koderef,t' +
-        'gltransaksi, 0 AS nopenjualankirim,nokontak,total FROM tbl_penju' +
-        'alantunai  where tgltransaksi between :tkd and :tks)AS a'
+        'gltransaksi, 0 AS nopenjualankirim,nokontak,total-biayalain as t' +
+        'otal FROM tbl_penjualantunai  where tgltransaksi between :tkd an' +
+        'd :tks)AS a'
       
         'LEFT JOIN tbl_penjualankirim AS b ON b.nopenjualankirim=a.nopenj' +
         'ualankirim)AS a'
@@ -70840,8 +70841,8 @@ object DM: TDM
       Font.Height = -11
       Font.Name = 'Century Gothic'
       Font.Style = []
-      PaperWidth = 210.000000000000000000
-      PaperHeight = 297.000000000000000000
+      PaperWidth = 297.000000000000000000
+      PaperHeight = 210.000000000000000000
       PaperSize = 256
       LeftMargin = 5.000000000000000000
       RightMargin = 5.000000000000000000
@@ -70851,11 +70852,11 @@ object DM: TDM
         FillType = ftBrush
         Height = 113.385882910000000000
         Top = 18.897650000000000000
-        Width = 755.906000000000000000
+        Width = 1084.725110000000000000
         object Memo1: TfrxMemoView
           Align = baWidth
           Top = 18.897650000000000000
-          Width = 755.906000000000000000
+          Width = 1084.725110000000000000
           Height = 26.456692910000000000
           AutoWidth = True
           Font.Charset = DEFAULT_CHARSET
@@ -70872,7 +70873,7 @@ object DM: TDM
         object Memo4: TfrxMemoView
           Align = baWidth
           Top = 45.354360000000000000
-          Width = 755.906000000000000000
+          Width = 1084.725110000000000000
           Height = 26.456692910000000000
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clNavy
@@ -70902,7 +70903,7 @@ object DM: TDM
         object txtperiode: TfrxMemoView
           Align = baWidth
           Top = 71.811070000000000000
-          Width = 755.906000000000000000
+          Width = 1084.725110000000000000
           Height = 18.897637800000000000
           AutoWidth = True
           Font.Charset = DEFAULT_CHARSET
@@ -70919,7 +70920,7 @@ object DM: TDM
         FillType = ftBrush
         Height = 18.897637800000000000
         Top = 264.567100000000000000
-        Width = 755.906000000000000000
+        Width = 1084.725110000000000000
         OnBeforePrint = 'MasterData1OnBeforePrint'
         DataSet = DS_KartuStokBarang
         DataSetName = 'DS_KartuStokBarang'
@@ -70943,7 +70944,7 @@ object DM: TDM
           ParentFont = False
         end
         object Memo29: TfrxMemoView
-          Left = 544.252320000000000000
+          Left = 797.480830000000000000
           Width = 75.590543860000000000
           Height = 18.897637800000000000
           StretchMode = smMaxHeight
@@ -70965,7 +70966,7 @@ object DM: TDM
           VAlign = vaCenter
         end
         object Memo32: TfrxMemoView
-          Left = 468.661720000000000000
+          Left = 721.890230000000000000
           Width = 75.590543860000000000
           Height = 18.897637800000000000
           StretchMode = smMaxHeight
@@ -70988,7 +70989,7 @@ object DM: TDM
         end
         object Memo7: TfrxMemoView
           Left = 75.590600000000000000
-          Width = 185.196847950000000000
+          Width = 362.834757950000000000
           Height = 18.897637800000000000
           StretchMode = smMaxHeight
           DataField = 'namabarang'
@@ -71006,7 +71007,7 @@ object DM: TDM
           ParentFont = False
         end
         object Memo25: TfrxMemoView
-          Left = 393.071120000000000000
+          Left = 570.709030000000000000
           Width = 75.590543860000000000
           Height = 18.897637800000000000
           StretchMode = smMaxHeight
@@ -71028,7 +71029,7 @@ object DM: TDM
           VAlign = vaCenter
         end
         object Memo13: TfrxMemoView
-          Left = 317.480520000000000000
+          Left = 495.118430000000000000
           Width = 75.590543860000000000
           Height = 18.897637800000000000
           StretchMode = smMaxHeight
@@ -71050,7 +71051,7 @@ object DM: TDM
           VAlign = vaCenter
         end
         object Memo17: TfrxMemoView
-          Left = 619.842920000000000000
+          Left = 873.071430000000000000
           Width = 75.590543860000000000
           Height = 18.897637800000000000
           StretchMode = smMaxHeight
@@ -71072,7 +71073,7 @@ object DM: TDM
           VAlign = vaCenter
         end
         object Memo22: TfrxMemoView
-          Left = 695.433520000000000000
+          Left = 1024.252630000000000000
           Width = 60.472423860000000000
           Height = 18.897637800000000000
           StretchMode = smMaxHeight
@@ -71090,14 +71091,15 @@ object DM: TDM
           Memo.UTF8 = (
             
               '[<DS_KartuStokBarangAwal."saldo">+<DS_KartuStokBarang."pembelian' +
-              '">+<DS_KartuStokBarang."returjual">-<DS_KartuStokBarang."penjual' +
-              'an">-<DS_KartuStokBarang."penjualantester">-<DS_KartuStokBarang.' +
-              '"returbeli">]')
+              '">+<DS_KartuStokBarang."returjual">+<DS_KartuStokBarang."lainmas' +
+              'uk">-<DS_KartuStokBarang."penjualan">-<DS_KartuStokBarang."penju' +
+              'alantester">-<DS_KartuStokBarang."returbeli">-<DS_KartuStokBaran' +
+              'g."lainkeluar">]')
           ParentFont = False
           VAlign = vaCenter
         end
         object Memo26: TfrxMemoView
-          Left = 260.787570000000000000
+          Left = 438.425480000000000000
           Width = 56.692893860000000000
           Height = 18.897637800000000000
           StretchMode = smMaxHeight
@@ -71117,17 +71119,61 @@ object DM: TDM
           ParentFont = False
           VAlign = vaCenter
         end
+        object Memo19: TfrxMemoView
+          Left = 948.662030000000000000
+          Width = 75.590543860000000000
+          Height = 18.897637800000000000
+          StretchMode = smMaxHeight
+          DataField = 'lainkeluar'
+          DataSet = DS_KartuStokBarang
+          DataSetName = 'DS_KartuStokBarang'
+          DisplayFormat.FormatStr = '#,#0.##'
+          DisplayFormat.Kind = fkNumeric
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Typ = [ftLeft]
+          HAlign = haRight
+          Memo.UTF8 = (
+            '[DS_KartuStokBarang."lainkeluar"]')
+          ParentFont = False
+          VAlign = vaCenter
+        end
+        object Memo23: TfrxMemoView
+          Left = 646.299630000000000000
+          Width = 75.590543860000000000
+          Height = 18.897637800000000000
+          StretchMode = smMaxHeight
+          DataField = 'lainmasuk'
+          DataSet = DS_KartuStokBarang
+          DataSetName = 'DS_KartuStokBarang'
+          DisplayFormat.FormatStr = '#,#0.##'
+          DisplayFormat.Kind = fkNumeric
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Typ = [ftLeft]
+          HAlign = haRight
+          Memo.UTF8 = (
+            '[DS_KartuStokBarang."lainmasuk"]')
+          ParentFont = False
+          VAlign = vaCenter
+        end
       end
       object PageFooter1: TfrxPageFooter
         FillType = ftBrush
         Height = 26.456710000000000000
         Top = 374.173470000000000000
-        Width = 755.906000000000000000
+        Width = 1084.725110000000000000
         OnBeforePrint = 'PageFooter1OnBeforePrint'
         object Memo52: TfrxMemoView
           Align = baWidth
           Top = 3.779530000000000000
-          Width = 755.906000000000000000
+          Width = 1084.725110000000000000
           Height = 3.779527560000000000
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -71158,7 +71204,7 @@ object DM: TDM
         FillType = ftBrush
         Height = 49.133877800000000000
         Top = 154.960730000000000000
-        Width = 755.906000000000000000
+        Width = 1084.725110000000000000
         object Memo5: TfrxMemoView
           Top = 3.779530000000000000
           Width = 75.590477950000000000
@@ -71177,7 +71223,7 @@ object DM: TDM
         end
         object Memo8: TfrxMemoView
           Align = baWidth
-          Width = 755.906000000000000000
+          Width = 1084.725110000000000000
           Height = 3.779527560000000000
           StretchMode = smActualHeight
           DisplayFormat.FormatStr = '#,#0.##'
@@ -71193,9 +71239,9 @@ object DM: TDM
           VAlign = vaCenter
         end
         object Memo14: TfrxMemoView
-          Left = 468.661720000000000000
+          Left = 721.890230000000000000
           Top = 3.779530000000000000
-          Width = 226.771743860000000000
+          Width = 302.362343860000000000
           Height = 18.897637800000000000
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -71210,7 +71256,7 @@ object DM: TDM
           VAlign = vaCenter
         end
         object Memo15: TfrxMemoView
-          Left = 544.252320000000000000
+          Left = 797.480830000000000000
           Top = 22.677180000000000000
           Width = 75.590551180000000000
           Height = 26.456697800000000000
@@ -71227,9 +71273,9 @@ object DM: TDM
           VAlign = vaCenter
         end
         object Memo20: TfrxMemoView
-          Left = 317.480520000000000000
+          Left = 495.118430000000000000
           Top = 3.779530000000000000
-          Width = 151.181143860000000000
+          Width = 226.771743860000000000
           Height = 18.897637800000000000
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -71246,7 +71292,7 @@ object DM: TDM
         object Memo6: TfrxMemoView
           Left = 75.590600000000000000
           Top = 3.779530000000000000
-          Width = 185.196847950000000000
+          Width = 362.834757950000000000
           Height = 45.354347800000000000
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -71261,7 +71307,7 @@ object DM: TDM
           VAlign = vaCenter
         end
         object Memo3: TfrxMemoView
-          Left = 393.071120000000000000
+          Left = 570.709030000000000000
           Top = 22.677180000000000000
           Width = 75.590551180000000000
           Height = 26.456697800000000000
@@ -71278,7 +71324,7 @@ object DM: TDM
           VAlign = vaCenter
         end
         object Memo9: TfrxMemoView
-          Left = 619.842920000000000000
+          Left = 873.071430000000000000
           Top = 22.677180000000000000
           Width = 75.590551180000000000
           Height = 26.456697800000000000
@@ -71295,7 +71341,7 @@ object DM: TDM
           VAlign = vaCenter
         end
         object Memo10: TfrxMemoView
-          Left = 468.661720000000000000
+          Left = 721.890230000000000000
           Top = 22.677180000000000000
           Width = 75.590551180000000000
           Height = 26.456697800000000000
@@ -71312,7 +71358,7 @@ object DM: TDM
           VAlign = vaCenter
         end
         object Memo12: TfrxMemoView
-          Left = 317.480520000000000000
+          Left = 495.118430000000000000
           Top = 22.677180000000000000
           Width = 75.590551180000000000
           Height = 26.456697800000000000
@@ -71329,7 +71375,7 @@ object DM: TDM
           VAlign = vaCenter
         end
         object Memo18: TfrxMemoView
-          Left = 695.433520000000000000
+          Left = 1024.252630000000000000
           Top = 3.779530000000000000
           Width = 60.472423860000000000
           Height = 45.354347800000000000
@@ -71346,7 +71392,7 @@ object DM: TDM
           VAlign = vaCenter
         end
         object Memo24: TfrxMemoView
-          Left = 260.787570000000000000
+          Left = 438.425480000000000000
           Top = 3.779530000000000000
           Width = 56.692893860000000000
           Height = 45.354347800000000000
@@ -71362,15 +71408,49 @@ object DM: TDM
           ParentFont = False
           VAlign = vaCenter
         end
+        object Memo11: TfrxMemoView
+          Left = 948.662030000000000000
+          Top = 22.677180000000000000
+          Width = 75.590551180000000000
+          Height = 26.456697800000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Typ = [ftLeft, ftTop, ftBottom]
+          HAlign = haCenter
+          Memo.UTF8 = (
+            'Lain')
+          ParentFont = False
+          VAlign = vaCenter
+        end
+        object Memo21: TfrxMemoView
+          Left = 646.299630000000000000
+          Top = 22.677180000000000000
+          Width = 75.590551180000000000
+          Height = 26.456697800000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Century Gothic'
+          Font.Style = []
+          Frame.Typ = [ftLeft, ftTop, ftBottom]
+          HAlign = haCenter
+          Memo.UTF8 = (
+            'Lain')
+          ParentFont = False
+          VAlign = vaCenter
+        end
       end
       object ReportSummary1: TfrxReportSummary
         FillType = ftBrush
         Height = 7.559060000000000000
         Top = 343.937230000000000000
-        Width = 755.906000000000000000
+        Width = 1084.725110000000000000
         object Memo16: TfrxMemoView
           Align = baWidth
-          Width = 755.906000000000000000
+          Width = 1084.725110000000000000
           Height = 3.779527560000000000
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -71388,6 +71468,9 @@ object DM: TDM
     Connection = con
     SQL.Strings = (
       'SELECT a.*,b.kodesatuan FROM'
+      
+        '(SELECT a.*,IFNULL(SUM(b.masuk),0)AS lainmasuk,IFNULL(SUM(b.kelu' +
+        'ar),0)AS lainkeluar FROM'
       '(SELECT a.*,IFNULL(SUM(b.keluar-b.masuk),0)AS returbeli FROM'
       
         '(SELECT a.*,IFNULL(SUM(b.keluar-b.masuk),0)AS penjualantester FR' +
@@ -71418,6 +71501,10 @@ object DM: TDM
         'LEFT JOIN tbl_bukubesarbarang AS b ON b.nobarang=a.nobarang AND ' +
         'b.tipe='#39'PR'#39' AND tgltransaksi BETWEEN :tkd AND :tks GROUP BY a.no' +
         'barang)AS a'
+      
+        'LEFT JOIN tbl_bukubesarbarang AS b ON b.nobarang=a.nobarang AND ' +
+        '((b.tipe='#39'OB'#39') or (b.tipe='#39'IJ'#39')) AND tgltransaksi BETWEEN :tkd A' +
+        'ND :tks GROUP BY a.nobarang)AS a'
       
         'LEFT JOIN tbl_satuan AS b ON b.nosatuan=a.nosatuan ORDER BY a.na' +
         'mabarang')

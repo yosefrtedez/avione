@@ -938,8 +938,7 @@ begin
                                           'WHEN b.tipe='+QuotedStr('DO')+' THEN (SELECT kodepenjualankirim FROM tbl_penjualankirim WHERE nopenjualankirim=noreferensi) ' +
                                           'WHEN b.tipe='+QuotedStr('SR')+' THEN (SELECT kodereturpenjualan FROM tbl_returpenjualan WHERE noreturpenjualan=noreferensi) ' +
                                           'WHEN b.tipe='+QuotedStr('SP')+' THEN (SELECT kodepenjualantunai FROM tbl_penjualantunai WHERE nopenjualantunai=noreferensi) ' +
-                                          'WHEN b.tipe='+QuotedStr('IJ')+' THEN (SELECT g.koderef FROM(SELECT nopenyesuaian AS noref,kodepenyesuaian AS koderef FROM tbl_penyesuaian UNION SELECT nopenerimaanbarang AS noref,' +
-                                          'kodepenerimaanbarang AS koderef FROM tbl_penerimaanbarang)AS g WHERE g.noref=noreferensi) END AS kodereferensi FROM ' +
+                                          'WHEN b.tipe='+QuotedStr('IJ')+' THEN (SELECT kodepenyesuaian FROM tbl_penyesuaian WHERE nopenyesuaian=noreferensi) END AS kodereferensi FROM ' +
                                           '(SELECT nobarang,kodebarang,namabarang,nosatuan FROM tbl_barang WHERE tipebarang=0 AND aktif=1)AS a ' +
                                           'LEFT JOIN tbl_bukubesarbarang AS b ON b.nobarang=a.nobarang and b.tgltransaksi BETWEEN :tkd AND :tks)AS a)as a ' +
                                           'LEFT JOIN tbl_satuan AS b ON b.nosatuan=a.nosatuan ORDER BY a.namabarang,a.tgltransaksi,a.nobuku';
@@ -956,8 +955,7 @@ begin
                                           'WHEN b.tipe='+QuotedStr('DO')+' THEN (SELECT kodepenjualankirim FROM tbl_penjualankirim WHERE nopenjualankirim=noreferensi) ' +
                                           'WHEN b.tipe='+QuotedStr('SR')+' THEN (SELECT kodereturpenjualan FROM tbl_returpenjualan WHERE noreturpenjualan=noreferensi) ' +
                                           'WHEN b.tipe='+QuotedStr('SP')+' THEN (SELECT kodepenjualantunai FROM tbl_penjualantunai WHERE nopenjualantunai=noreferensi) ' +
-                                          'WHEN b.tipe='+QuotedStr('IJ')+' THEN (SELECT g.koderef FROM(SELECT nopenyesuaian AS noref,kodepenyesuaian AS koderef FROM tbl_penyesuaian UNION SELECT nopenerimaanbarang AS noref,' +
-                                          'kodepenerimaanbarang AS koderef FROM tbl_penerimaanbarang)AS g WHERE g.noref=noreferensi) END AS kodereferensi FROM ' +
+                                          'WHEN b.tipe='+QuotedStr('IJ')+' THEN (SELECT kodepenyesuaian FROM tbl_penyesuaian WHERE nopenyesuaian=noreferensi) END AS kodereferensi FROM ' +
                                           '(SELECT nobarang,kodebarang,namabarang,nosatuan FROM tbl_barang WHERE tipebarang=0 AND aktif=1)AS a ' +
                                           'LEFT JOIN tbl_bukubesarbarang AS b ON b.nobarang=a.nobarang and b.tgltransaksi BETWEEN :tkd AND :tks and nogudang=:ng)AS a)as a ' +
                                           'LEFT JOIN tbl_satuan AS b ON b.nosatuan=a.nosatuan ORDER BY a.namabarang,a.tgltransaksi,a.nobuku';
@@ -977,8 +975,7 @@ begin
                                           'WHEN b.tipe='+QuotedStr('DO')+' THEN (SELECT kodepenjualankirim FROM tbl_penjualankirim WHERE nopenjualankirim=noreferensi) ' +
                                           'WHEN b.tipe='+QuotedStr('SR')+' THEN (SELECT kodereturpenjualan FROM tbl_returpenjualan WHERE noreturpenjualan=noreferensi) ' +
                                           'WHEN b.tipe='+QuotedStr('SP')+' THEN (SELECT kodepenjualantunai FROM tbl_penjualantunai WHERE nopenjualantunai=noreferensi) ' +
-                                          'WHEN b.tipe='+QuotedStr('IJ')+' THEN (SELECT g.koderef FROM(SELECT nopenyesuaian AS noref,kodepenyesuaian AS koderef FROM tbl_penyesuaian UNION SELECT nopenerimaanbarang AS noref,' +
-                                          'kodepenerimaanbarang AS koderef FROM tbl_penerimaanbarang)AS g WHERE g.noref=noreferensi) END AS kodereferensi FROM ' +
+                                          'WHEN b.tipe='+QuotedStr('IJ')+' THEN (SELECT kodepenyesuaian FROM tbl_penyesuaian WHERE nopenyesuaian=noreferensi) END AS kodereferensi FROM ' +
                                           '(SELECT nobarang,kodebarang,namabarang,nosatuan FROM tbl_barang WHERE tipebarang=0 AND aktif=1 and nobarang=:nk)AS a ' +
                                           'LEFT JOIN tbl_bukubesarbarang AS b ON b.nobarang=a.nobarang and b.tgltransaksi BETWEEN :tkd AND :tks)AS a)as a ' +
                                           'LEFT JOIN tbl_satuan AS b ON b.nosatuan=a.nosatuan ORDER BY a.namabarang,a.tgltransaksi,a.nobuku';
@@ -995,8 +992,7 @@ begin
                                           'WHEN b.tipe='+QuotedStr('DO')+' THEN (SELECT kodepenjualankirim FROM tbl_penjualankirim WHERE nopenjualankirim=noreferensi) ' +
                                           'WHEN b.tipe='+QuotedStr('SR')+' THEN (SELECT kodereturpenjualan FROM tbl_returpenjualan WHERE noreturpenjualan=noreferensi) ' +
                                           'WHEN b.tipe='+QuotedStr('SP')+' THEN (SELECT kodepenjualantunai FROM tbl_penjualantunai WHERE nopenjualantunai=noreferensi) ' +
-                                          'WHEN b.tipe='+QuotedStr('IJ')+' THEN (SELECT g.koderef FROM(SELECT nopenyesuaian AS noref,kodepenyesuaian AS koderef FROM tbl_penyesuaian UNION SELECT nopenerimaanbarang AS noref,' +
-                                          'kodepenerimaanbarang AS koderef FROM tbl_penerimaanbarang)AS g WHERE g.noref=noreferensi) END AS kodereferensi FROM ' +
+                                          'WHEN b.tipe='+QuotedStr('IJ')+' THEN (SELECT kodepenyesuaian FROM tbl_penyesuaian WHERE nopenyesuaian=noreferensi) END AS kodereferensi FROM ' +
                                           '(SELECT nobarang,kodebarang,namabarang,nosatuan FROM tbl_barang WHERE tipebarang=0 AND aktif=1 and nobarang=:nk)AS a ' +
                                           'LEFT JOIN tbl_bukubesarbarang AS b ON b.nobarang=a.nobarang and b.tgltransaksi BETWEEN :tkd AND :tks and nogudang=:ng)AS a)as a ' +
                                           'LEFT JOIN tbl_satuan AS b ON b.nosatuan=a.nosatuan ORDER BY a.namabarang,a.tgltransaksi,a.nobuku';

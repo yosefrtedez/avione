@@ -64,11 +64,11 @@ object Frm_SettingWewenang: TFrm_SettingWewenang
     Top = 0
     Width = 516
     Height = 332
-    ActivePage = TabSheet3
+    ActivePage = TabSheet7
     ActivePageDefault = TabSheet1
     Align = alClient
     BoldCurrentTab = True
-    TabIndex = 1
+    TabIndex = 6
     TabOrder = 0
     TabOrientation = toLeft
     TabSequence = tsReverse
