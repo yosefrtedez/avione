@@ -63,13 +63,13 @@ type
     QDatatglpenjualaninvoice: TDateField;
     QDetailnopenjualaninvoice: TStringField;
     QDatatgltempo: TDateField;
-    QDataN2: TLargeintField;
     dbgdataDBTableView1Column1: TcxGridDBColumn;
     QDataN1: TFloatField;
     QDataN3: TLargeintField;
     QDataN4: TLargeintField;
     QDataduedate: TIntegerField;
     dbgdataDBTableView1Column2: TcxGridDBColumn;
+    QDataN2: TFloatField;
     procedure FormShow(Sender: TObject);
     procedure BtnSelesaiClick(Sender: TObject);
     procedure BtnUpdateClick(Sender: TObject);

@@ -1,6 +1,6 @@
 object Frm_RincianPiutang: TFrm_RincianPiutang
-  Left = 327
-  Top = 0
+  Left = 324
+  Top = 24
   Align = alClient
   BorderStyle = bsNone
   Caption = 'Perincian Piutang Usaha'
@@ -401,29 +401,29 @@ object Frm_RincianPiutang: TFrm_RincianPiutang
       ReadOnly = True
       DisplayFormat = 'dd MMM yyyy'
     end
-    object QDataN2: TLargeintField
-      FieldName = 'N2'
-      ReadOnly = True
-      DisplayFormat = '#,#0.##'
-    end
     object QDataN1: TFloatField
       FieldName = 'N1'
-      ReadOnly = True
-      DisplayFormat = '#,#0.##'
-    end
-    object QDataN3: TLargeintField
-      FieldName = 'N3'
-      ReadOnly = True
-      DisplayFormat = '#,#0.##'
-    end
-    object QDataN4: TLargeintField
-      FieldName = 'N4'
       ReadOnly = True
       DisplayFormat = '#,#0.##'
     end
     object QDataduedate: TIntegerField
       FieldName = 'duedate'
       ReadOnly = True
+    end
+    object QDataN2: TFloatField
+      FieldName = 'N2'
+      ReadOnly = True
+      DisplayFormat = '#,#0.##'
+    end
+    object QDataN3: TFloatField
+      FieldName = 'N3'
+      ReadOnly = True
+      DisplayFormat = '#,#0.##'
+    end
+    object QDataN4: TFloatField
+      FieldName = 'N4'
+      ReadOnly = True
+      DisplayFormat = '#,#0.##'
     end
   end
   object DSData: TDataSource
